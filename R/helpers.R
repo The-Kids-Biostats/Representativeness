@@ -94,7 +94,7 @@ make_var_plot <- function(dat, var_name, missing_as_level = TRUE) {
         }
       )
 
-    ggplot2::ggplot(dat2, ggplot2::aes(x = .x, fill = .included)) +
+    ggplot2::ggplot(dat2, ggplot2::aes(x = .included, fill = .x)) +
       ggplot2::geom_bar(position = "fill") +
       ggplot2::scale_y_continuous(labels = scales::percent_format()) +
       ggplot2::labs(x = var_name, y = "Proportion", fill = "") +
