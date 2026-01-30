@@ -76,7 +76,7 @@ make_var_plot <- function(dat, var_name, missing_as_level = TRUE, var_type = NUL
         .x = if (isTRUE(missing_as_level)) forcats::fct_explicit_na(.x, "(Missing)") else .x
       )
     
-    ggplot(dat2, aes(x = .x, fill = .included)) +
+    ggplot(dat2, aes(x = .included, fill = .x)) +
       geom_bar(position = "fill") +
       scale_y_continuous(labels = scales::percent_format()) +
       labs(x = var_name, y = "Proportion", fill = "") +
