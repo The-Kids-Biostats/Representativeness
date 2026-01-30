@@ -1,0 +1,170 @@
+---
+title: "Representativeness Report"
+subtitle: ""
+author:
+  name: "S Hiny"
+  affiliation:
+  - "The Kids Research Institute Australia, Perth, WA, Australia"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+title-block-banner: "#1F3B73"
+format:
+  html:
+    embed-resources: true
+    code-fold: true
+    toc: true
+    toc-location: left
+    html-table-processing: none
+    self-contained: true
+    mainfont: "Barlow"
+    include-in-header: 
+      text: |
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Barlow&display=swap');
+        </style>
+reference-location: margin 
+citation-location: margin 
+css: _extensions/html/styles.css
+params:
+  payload_rds: null
+editor_options: 
+  chunk_output_type: inline
+execute:
+  echo: false
+  warning: false
+  message: false
+  error: false
+callout-icon: false
+---
+
+```{r}
+library(thekidsbiostats)
+library(forcats)
+library(scales)
+library(knitr)
+
+payload <- readRDS(params$payload_rds)
+
+balance_numeric <- payload$balance_numeric
+balance_categorical <- payload$balance_categorical
+dat <- payload$combined
+vars <- payload$vars
+missing_as_level <- isTRUE(payload$missing_as_level)
+```
+
+
+```{r}
+plot_theme <- function() {
+  if (exists("theme_thekids", mode = "function")) theme_thekids() else theme_minimal()
+}
+
+make_var_plot <- function(dat, var_name, missing_as_level = TRUE) {
+  x <- dat[[var_name]]
+  
+  if (is.numeric(x)) {
+    ggplot(dat, aes(x = .data[[var_name]], fill = .included)) +
+      geom_density(alpha = 0.35, na.rm = TRUE) +
+      labs(x = var_name, y = "Density", fill = "") +
+      theme_thekids()
+  } else {
+    dat2 <- dat %>%
+      mutate(
+        .x = as.factor(.data[[var_name]]),
+        .x = if (isTRUE(missing_as_level)) forcats::fct_explicit_na(.x, "(Missing)") else .x
+      )
+    
+    ggplot(dat2, aes(x = .x, fill = .included)) +
+      geom_bar(position = "fill") +
+      scale_y_continuous(labels = scales::percent_format()) +
+      labs(x = var_name, y = "Proportion", fill = "") +
+      theme_thekids()
+  }
+}
+```
+
+```{r}
+make_var_summary <- function(dat, var_name, missing_as_level = TRUE) {
+  x <- dat[[var_name]]
+  
+  if (is.numeric(x)) {
+    dat %>%
+      group_by(.included) %>%
+      summarise(
+        N = sum(!is.na(.data[[var_name]])),
+        Missing = round(100 * mean(is.na(.data[[var_name]])), 1),
+        Mean = mean(.data[[var_name]], na.rm = TRUE),
+        SD = sd(.data[[var_name]], na.rm = TRUE),
+        Median = median(.data[[var_name]], na.rm = TRUE),
+        Q1 = quantile(.data[[var_name]], 0.25, na.rm = TRUE),
+        Q3 = quantile(.data[[var_name]], 0.75, na.rm = TRUE),
+        .groups = "drop"
+      )
+  } else {
+    dat2 <- dat %>%
+      mutate(
+        .x = as.factor(.data[[var_name]]),
+        .x = if (isTRUE(missing_as_level)) forcats::fct_explicit_na(.x, "(Missing)") else .x
+      )
+    
+    dat2 %>%
+      count(.included, .x) %>%
+      group_by(.included) %>%
+      mutate(Percent = round(100 * n / sum(n), 1)) %>%
+      ungroup() %>%
+      rename(Level = .x, N = n) %>%
+      arrange(.included, desc(N))
+    
+  }
+}
+```
+
+## Snapshot
+
+```{r}
+cat("Generated on:", format(payload$generated_on), "\n")
+cat("ID variable:", payload$id_var, "\n")
+cat("Missing treated as level (categorical):", missing_as_level, "\n")
+cat("Drilldowns included:", isTRUE(payload$include_drilldowns), "\n")
+```
+
+## Overview
+
+### Numeric Variables
+
+```{r}
+if (nrow(balance_numeric) == 0) {
+cat("No numeric variables available.\n")
+} else {
+  balance_numeric  %>%
+    thekids_table(colour = "MidnightBlue", padding = 0.2)
+}
+```
+
+### Categorical Variables
+
+```{r}
+if (nrow(balance_categorical) == 0) {
+cat("No categorical variables available.\n")
+} else {
+  balance_categorical  %>%
+    thekids_table(colour = "MidnightBlue", padding = 0.2)
+}
+```
+
+## Drilldowns
+
+```{r}
+if (!isTRUE(payload$include_drilldowns)) {
+  cat("Drilldowns not included.\n")
+} else if (length(vars) == 0) {
+  cat("No variables selected for drilldown.\n")
+} else {
+  for (v in vars) {
+    cat("\n\n## ", v, "\n", sep = "")
+    print(make_var_plot(dat, v, missing_as_level))
+    cat("\n\n")
+    make_var_summary(dat, v, missing_as_level) %>%
+      thekids_table(colour = "MidnightBlue", padding = 0.2)
+  }
+}
+```
+

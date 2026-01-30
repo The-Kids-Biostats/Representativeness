@@ -1,0 +1,3 @@
+variable types - override option in Overview main panel, add ordinal (binary?) and date tables. Allow user definition of ordinal levels upon override. Move overwritten variables to appropriate table. 
+
+OR table thats lists variables in best guess, allows user to drag and drop. Probabily in separate (initial) panel. 

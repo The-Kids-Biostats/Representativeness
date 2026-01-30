@@ -1,0 +1,301 @@
+id,site,enrol_date,age,sex,region,education,bmi,income_aud,score_std,smoker,chronic_condition,n_visits_last_year,wellbeing_score,transport_mode,notes
+ID0001,Site_F,2023-03-23,45,Male,Metro,Postgrad,33.9,49077,0.406,FALSE,FALSE,1,65.8,Public transport,no notes
+ID0002,Site_E,2024-01-20,25,Male,Metro,Bachelor+,27.9,31272,-1.662,TRUE,FALSE,3,53.8,Public transport,no notes
+ID0003,Site_F,2024-04-21,22,Female,Regional,Year 10 or less,32.2,22345,-0.315,TRUE,FALSE,4,53.1,Public transport,
+ID0004,Site_B,2023-02-08,27,Male,Metro,Year 12,31.1,70772,1.05,FALSE,FALSE,2,65.3,Public transport,prefers morning
+ID0005,Site_C,2023-11-17,48,Female,Regional,Postgrad,21.3,82743,-0.665,FALSE,FALSE,2,69.7,Car,
+ID0006,Site_E,2025-02-10,22,Male,Metro,Certificate/Diploma,37.2,41349,-0.508,FALSE,FALSE,4,42.3,Car,no notes
+ID0007,Site_B,2023-03-05,47,Female,Regional,Year 12,28.5,93298,1.343,FALSE,FALSE,1,77.5,Car,prefers afternoon
+ID0008,Site_D,2024-02-03,38,Female,Metro,Certificate/Diploma,28.4,245444,1.755,TRUE,FALSE,4,54.4,Bike,no notes
+ID0009,Site_A,2023-07-13,36,Male,Regional,Postgrad,25.5,44293,0.832,TRUE,TRUE,5,51.7,Walk,no notes
+ID0010,Site_E,2025-04-06,42,Male,Regional,Year 12,25.9,51740,0.157,TRUE,FALSE,3,48.2,Walk,prefers morning
+ID0011,Site_D,2023-05-05,63,Male,Metro,Year 10 or less,30.2,66388,0.825,FALSE,TRUE,3,42.5,Car,prefers morning
+ID0012,Site_D,2023-10-15,38,Male,Metro,Year 12,22.3,62380,0.389,FALSE,FALSE,1,66.3,Car,no notes
+ID0013,Site_D,2023-09-07,33,Male,Regional,Year 12,24.9,46904,-1.626,FALSE,TRUE,4,23.8,Car,prefers afternoon
+ID0014,Site_A,2025-01-01,60,Female,Regional,Year 12,28.3,64593,-1.168,TRUE,FALSE,2,73.2,Public transport,needs interpreter
+ID0015,Site_D,2023-12-31,52,Female,Regional,Certificate/Diploma,37.1,47596,0.774,FALSE,FALSE,0,53.4,Public transport,no notes
+ID0016,Site_C,2024-04-08,37,Male,Metro,Certificate/Diploma,29.9,180506,-0.252,FALSE,FALSE,2,60.1,Car,
+ID0017,Site_D,2025-04-30,49,Male,Regional,Year 12,25.5,108926,0.13,FALSE,TRUE,2,48.4,Car,no notes
+ID0018,Site_E,2023-11-25,65,Male,Regional,Year 10 or less,22.2,45973,-0.88,FALSE,TRUE,4,48.7,Car,prefers morning
+ID0019,Site_D,2025-01-31,26,Female,Regional,Certificate/Diploma,29.4,107037,-1.491,FALSE,FALSE,0,55,Public transport,needs interpreter
+ID0020,Site_E,2024-11-15,37,Male,Metro,Certificate/Diploma,21.8,102867,0.783,TRUE,TRUE,3,44.8,Car,prefers morning
+ID0021,Site_C,2024-04-11,58,Male,Regional,Bachelor+,23.7,125115,-0.491,FALSE,TRUE,1,51.1,Car,prefers afternoon
+ID0022,Site_D,2023-09-22,42,Female,Regional,Certificate/Diploma,24.4,46858,0.931,FALSE,FALSE,3,58,Public transport,no notes
+ID0023,Site_D,2023-12-12,21,Male,Metro,Year 10 or less,28.4,44563,1.418,FALSE,FALSE,0,45.5,Car,needs interpreter
+ID0024,Site_D,2024-06-25,33,Female,Regional,Year 12,35.2,85092,-1.044,FALSE,FALSE,0,33.4,Car,prefers morning
+ID0025,Site_B,2024-06-26,31,Female,Metro,Certificate/Diploma,24.9,132473,0.372,FALSE,FALSE,1,58.7,Car,
+ID0026,Site_D,2023-07-20,34,Female,Regional,Year 12,27,70255,0.438,TRUE,FALSE,5,45,Car,
+ID0027,Site_A,2024-05-05,43,Female,Regional,Certificate/Diploma,31.7,107183,0.323,FALSE,FALSE,3,56.5,Car,prefers morning
+ID0028,Site_E,2023-01-18,54,Male,Metro,Year 12,22.6,87601,0.87,FALSE,FALSE,3,50,Car,no notes
+ID0029,Site_B,2023-08-11,26,Male,Metro,Certificate/Diploma,27.9,27922,0.741,FALSE,FALSE,5,56.5,Public transport,no notes
+ID0030,Site_F,2024-12-26,48,Female,Metro,Postgrad,33.1,78600,0.782,FALSE,TRUE,1,54.2,Car,prefers afternoon
+ID0031,Site_F,2025-05-13,52,Male,Regional,Year 12,31.2,39517,-0.652,FALSE,FALSE,3,41,Car,prefers afternoon
+ID0032,Site_D,2024-10-02,45,Male,Metro,Certificate/Diploma,21.5,45188,-0.358,FALSE,FALSE,3,52.4,Car,
+ID0033,Site_E,2023-09-05,31,Male,Metro,Year 10 or less,26.2,69308,1.125,FALSE,FALSE,4,50.7,Other,no notes
+ID0034,Site_F,2023-10-01,36,Female,Metro,Certificate/Diploma,32.6,141439,1.282,FALSE,FALSE,4,45.5,Public transport,no notes
+ID0035,Site_D,2023-08-26,22,Male,Metro,Bachelor+,20.5,54085,0.681,FALSE,FALSE,1,34.9,Car,prefers morning
+ID0036,Site_D,2024-01-28,18,Female,Regional,Postgrad,22.1,45281,-1.48,FALSE,FALSE,3,44.2,Car,prefers afternoon
+ID0037,Site_E,2025-01-29,51,Female,Metro,Bachelor+,29.8,30778,-0.666,FALSE,TRUE,4,49.7,Public transport,prefers morning
+ID0038,Site_E,2023-01-29,69,Female,Metro,Year 10 or less,30.8,90165,-0.893,FALSE,TRUE,2,55.5,Car,no notes
+ID0039,Site_A,2023-10-21,35,Female,Regional,Certificate/Diploma,36,47073,0.872,TRUE,FALSE,1,44.5,Car,no notes
+ID0040,Site_A,2024-07-10,33,Female,Metro,Year 10 or less,21.5,101683,1.787,FALSE,FALSE,1,72.8,Bike,
+ID0041,Site_D,2024-12-22,58,Male,Metro,Year 12,26.4,45852,0.732,FALSE,FALSE,0,49.9,Bike,
+ID0042,Site_F,2024-02-29,42,Male,Metro,Year 10 or less,26,62135,0.138,FALSE,FALSE,4,49.2,Other,
+ID0043,Site_B,2023-07-17,53,Female,Metro,Year 12,29.3,43387,0.125,FALSE,FALSE,3,67.5,Car,no notes
+ID0044,Site_E,2023-09-16,42,Female,Metro,Year 12,29.2,149713,1.787,TRUE,FALSE,2,54.5,Car,prefers morning
+ID0045,Site_E,2023-05-19,23,Female,Regional,Year 12,20.3,40410,-0.357,FALSE,FALSE,1,60.3,Bike,prefers afternoon
+ID0046,Site_D,2023-05-02,50,Female,Metro,Bachelor+,22.8,48428,-0.009,TRUE,TRUE,4,50.7,Walk,no notes
+ID0047,Site_B,2023-10-11,53,Male,Regional,Bachelor+,28,180652,-0.672,FALSE,FALSE,2,62.5,Public transport,no notes
+ID0048,Site_F,2023-03-06,33,Other,Regional,Year 10 or less,24.1,106761,0.115,TRUE,TRUE,1,49.3,Car,prefers afternoon
+ID0049,Site_C,2024-01-17,31,Female,Metro,Certificate/Diploma,24.1,47510,0.272,FALSE,FALSE,2,61.3,Car,prefers afternoon
+ID0050,Site_C,2023-04-08,46,Female,Metro,Bachelor+,27.7,94916,1.245,FALSE,TRUE,0,71.4,Car,no notes
+ID0051,Site_F,2023-08-10,44,Male,Metro,Year 12,25.4,122605,1.565,FALSE,TRUE,5,45.3,Car,no notes
+ID0052,Site_F,2024-12-26,44,Male,Metro,Postgrad,30,101942,0.571,FALSE,FALSE,1,65.6,Walk,no notes
+ID0053,Site_F,2025-05-07,43,Male,Remote,Year 10 or less,20.5,54678,-0.135,FALSE,TRUE,3,59.7,Other,prefers morning
+ID0054,Site_B,2023-12-06,28,Female,Metro,Certificate/Diploma,27.7,60578,0.309,FALSE,FALSE,4,48.9,Car,prefers afternoon
+ID0055,Site_B,2024-06-30,26,Male,Metro,Certificate/Diploma,28.3,146235,-0.288,FALSE,FALSE,2,48.9,Car,no notes
+ID0056,Site_E,2025-01-22,29,Male,Regional,Bachelor+,29.8,63493,1.636,FALSE,FALSE,0,46.5,Car,needs interpreter
+ID0057,Site_F,2024-07-02,33,Male,Metro,Certificate/Diploma,29.5,65686,-1.372,TRUE,TRUE,0,55.7,Car,prefers morning
+ID0058,Site_A,2023-11-08,29,Female,Regional,Certificate/Diploma,21.4,56756,-0.58,FALSE,TRUE,3,41.2,Car,no notes
+ID0059,Site_A,2024-07-26,46,Male,Metro,Certificate/Diploma,30.7,67618,0.974,FALSE,TRUE,3,49.8,Car,no notes
+ID0060,Site_F,2023-11-06,39,Male,Regional,Year 12,34.2,140118,0.426,FALSE,FALSE,0,66.2,Public transport,no notes
+ID0061,Site_C,2024-03-10,41,Female,Regional,Year 12,25.4,23877,-1.349,TRUE,FALSE,2,62.6,Car,prefers morning
+ID0062,Site_D,2025-04-26,36,Female,Regional,Year 10 or less,21.6,114339,0.15,FALSE,FALSE,4,48.6,Public transport,prefers morning
+ID0063,Site_F,2024-12-27,32,Male,Regional,Bachelor+,31,92058,-3.312,FALSE,FALSE,2,61.8,Car,no notes
+ID0064,Site_E,2025-05-01,50,Male,Metro,Postgrad,29.2,50995,0.649,FALSE,TRUE,3,51.7,Car,no notes
+ID0065,Site_E,2023-07-18,31,Male,Metro,Bachelor+,23.9,78209,1.153,FALSE,FALSE,3,48.4,Car,no notes
+ID0066,Site_D,2023-10-15,51,Male,Metro,Year 12,34.6,41039,0.451,TRUE,FALSE,3,50.7,Car,no notes
+ID0067,Site_D,2025-02-09,18,Male,Metro,Certificate/Diploma,28.2,39632,1.81,FALSE,TRUE,5,31.7,Car,no notes
+ID0068,Site_F,2024-06-09,44,Male,Metro,Bachelor+,27.9,36071,0.329,FALSE,TRUE,2,59.5,Public transport,prefers morning
+ID0069,Site_F,2024-05-13,46,Male,Metro,Certificate/Diploma,20.4,49426,1.829,FALSE,TRUE,2,63.1,Car,prefers morning
+ID0070,Site_C,2024-12-13,48,Female,Metro,Year 12,24.2,70826,-0.341,FALSE,FALSE,1,50.4,Car,no notes
+ID0071,Site_A,2023-02-03,45,Male,Metro,Year 12,24.3,75411,0.805,TRUE,TRUE,4,48.5,Other,no notes
+ID0072,Site_A,2023-12-01,36,Male,Metro,Year 10 or less,12.3,31628,0.783,FALSE,FALSE,4,58,Public transport,prefers afternoon
+ID0073,Site_D,2023-06-27,40,Male,Regional,Certificate/Diploma,31.6,61753,0.874,TRUE,FALSE,2,48.5,Public transport,no notes
+ID0074,Site_E,2023-09-18,28,Male,Metro,Certificate/Diploma,26.6,45329,-0.465,FALSE,FALSE,1,43,Public transport,no notes
+ID0075,Site_E,2023-09-17,34,Male,Remote,Postgrad,32.7,,0.554,TRUE,TRUE,1,51.5,Car,no notes
+ID0076,Site_E,2024-04-15,32,Female,Regional,Bachelor+,32.8,53927,-0.816,FALSE,TRUE,2,46.6,Car,prefers afternoon
+ID0077,Site_D,2023-08-08,37,Male,Metro,Year 12,28.9,100802,0.073,FALSE,FALSE,3,41.8,Car,no notes
+ID0078,Site_D,2025-05-03,31,Female,Metro,Year 12,27.3,81967,0.214,TRUE,FALSE,4,48.1,Car,no notes
+ID0079,Site_B,2025-01-21,62,Female,Regional,Certificate/Diploma,24.9,229016,-0.915,FALSE,FALSE,3,54,Car,prefers afternoon
+ID0080,Site_D,2024-07-11,61,Male,Metro,Year 12,33.5,77741,-0.538,FALSE,TRUE,2,57,Car,
+ID0081,Site_D,2024-03-29,23,Female,Regional,Bachelor+,35,118171,1.344,FALSE,FALSE,0,65.5,Car,prefers afternoon
+ID0082,Site_B,2024-10-16,51,Female,Metro,Year 12,30.2,133381,1.709,FALSE,FALSE,1,52.5,Bike,no notes
+ID0083,Site_E,2024-03-14,59,Female,Metro,Certificate/Diploma,22.2,54137,-1.033,FALSE,TRUE,2,47.9,Car,needs interpreter
+ID0084,Site_F,2024-01-25,39,Female,Metro,Bachelor+,32.1,45250,-0.024,FALSE,FALSE,1,60.3,Car,no notes
+ID0085,Site_A,2023-11-04,43,Female,Regional,Year 12,30.2,67241,-0.182,FALSE,TRUE,4,54,Car,
+ID0086,Site_C,2025-05-27,52,Male,Metro,Year 10 or less,28.8,92972,-0.309,TRUE,FALSE,4,57.3,Car,no notes
+ID0087,Site_E,2023-05-29,50,Other,Metro,Certificate/Diploma,27.6,96194,-0.488,FALSE,TRUE,2,48.1,Car,no notes
+ID0088,Site_A,2025-05-11,45,Female,Metro,Certificate/Diploma,26.2,61260,0.979,TRUE,FALSE,1,47.6,Car,no notes
+ID0089,Site_F,2024-05-05,47,Female,Remote,Certificate/Diploma,30.8,135445,1.272,FALSE,TRUE,1,53.5,Car,prefers morning
+ID0090,Site_B,2023-03-08,52,Female,Metro,Year 10 or less,27.3,74087,1.259,FALSE,FALSE,4,43.5,Public transport,prefers afternoon
+ID0091,Site_D,2024-01-12,70,Female,Metro,Certificate/Diploma,25.6,110789,1.32,FALSE,FALSE,4,33,Car,prefers afternoon
+ID0092,Site_A,2023-01-07,52,Male,Metro,Bachelor+,37.1,18592,0.317,FALSE,FALSE,1,62.5,Car,no notes
+ID0093,Site_D,2024-04-20,34,Male,Regional,Year 12,26.8,30348,0.731,FALSE,FALSE,2,46,Car,no notes
+ID0094,Site_B,2024-05-28,52,Male,Regional,Certificate/Diploma,20.1,57788,1.245,FALSE,TRUE,1,55.3,Walk,prefers morning
+ID0095,Site_E,2025-02-22,42,Female,Metro,Bachelor+,17.7,29302,-0.082,TRUE,TRUE,2,39.5,Car,needs interpreter
+ID0096,Site_D,2023-11-10,48,Male,Regional,Year 12,30.1,45781,-0.336,TRUE,TRUE,4,48.3,Car,prefers afternoon
+ID0097,Site_C,2024-06-14,45,Male,Metro,Year 10 or less,23.6,113862,-0.57,FALSE,FALSE,4,61.3,Public transport,no notes
+ID0098,Site_E,2023-09-16,42,Female,Regional,Certificate/Diploma,24.8,114088,0.638,FALSE,TRUE,5,55.1,Car,no notes
+ID0099,Site_D,2024-05-30,39,Female,Metro,Postgrad,34.8,107973,-0.294,FALSE,FALSE,1,62.5,Bike,no notes
+ID0100,Site_A,2025-04-09,30,Male,Metro,Year 10 or less,21.1,126339,0.917,FALSE,FALSE,1,70.8,Walk,no notes
+ID0101,Site_F,2023-07-11,66,Male,Metro,Bachelor+,30.5,99227,-0.264,FALSE,TRUE,1,66.4,Public transport,needs interpreter
+ID0102,Site_B,2024-09-24,44,Male,Metro,Year 12,27.5,22535,0.524,TRUE,FALSE,3,64.9,Bike,
+ID0103,Site_A,2024-02-29,56,Female,Regional,Postgrad,,55857,-1.673,TRUE,FALSE,1,51.6,Car,
+ID0104,Site_D,2023-09-09,34,Female,Metro,Postgrad,23.8,79747,1.512,FALSE,FALSE,2,53.1,Public transport,prefers afternoon
+ID0105,Site_B,2023-05-27,39,Female,Metro,Bachelor+,23,63942,-0.004,FALSE,FALSE,3,69.6,Walk,no notes
+ID0106,Site_C,2024-09-01,54,Male,Metro,Bachelor+,22.6,93225,-0.99,FALSE,FALSE,2,61.4,Walk,no notes
+ID0107,Site_D,2024-03-26,53,Other,Metro,Bachelor+,26,41566,-1.484,TRUE,FALSE,3,59.3,Walk,prefers morning
+ID0108,Site_A,2024-03-18,42,Male,Metro,Certificate/Diploma,30.8,51188,-0.681,FALSE,FALSE,0,61.9,Car,prefers morning
+ID0109,Site_B,2023-07-21,39,Female,Metro,Certificate/Diploma,32.3,113739,-0.689,FALSE,FALSE,2,61.2,Car,needs interpreter
+ID0110,Site_D,2023-09-27,38,Male,Metro,Bachelor+,32.1,53136,1.149,FALSE,FALSE,1,48.4,Car,no notes
+ID0111,Site_A,2024-08-18,51,Female,Metro,Postgrad,31.8,177155,-0.398,FALSE,TRUE,1,46.2,Public transport,prefers morning
+ID0112,Site_B,2023-03-09,53,Female,Metro,Postgrad,24.2,22867,0.45,FALSE,FALSE,1,73.5,Car,prefers afternoon
+ID0113,Site_C,2025-06-17,44,Male,Metro,Bachelor+,30,118987,1.224,FALSE,FALSE,2,55.5,Public transport,needs interpreter
+ID0114,Site_E,2024-06-01,29,Female,Metro,Year 10 or less,25.3,56738,1.399,FALSE,TRUE,4,35.8,Car,no notes
+ID0115,Site_B,2025-04-27,30,Female,Metro,Year 10 or less,20.1,97217,-0.767,FALSE,FALSE,4,51.2,Car,needs interpreter
+ID0116,Site_F,2023-12-25,60,Female,Metro,Year 10 or less,32.5,63576,0.464,FALSE,TRUE,1,51.1,Car,no notes
+ID0117,Site_B,2025-01-12,24,Male,Metro,Bachelor+,30.6,56456,-0.263,FALSE,TRUE,9,54.9,Car,prefers morning
+ID0118,Site_B,2024-11-30,36,Male,Metro,Bachelor+,28.2,76739,-0.11,TRUE,TRUE,2,51.8,Car,no notes
+ID0119,Site_B,2023-01-11,36,Female,Metro,Year 12,32,63744,0.956,TRUE,FALSE,2,63.8,Bike,prefers afternoon
+ID0120,Site_C,2023-01-18,59,Female,Metro,Bachelor+,19,56189,0.324,FALSE,FALSE,1,61.1,Car,
+ID0121,Site_E,2024-08-24,18,Female,Metro,Postgrad,32.2,56599,-0.885,FALSE,TRUE,1,50.9,Walk,no notes
+ID0122,Site_C,2024-05-05,50,Female,Metro,Year 12,19.2,58661,-0.322,FALSE,FALSE,4,53.8,Car,
+ID0123,Site_C,2023-04-22,29,Male,Metro,Certificate/Diploma,29.4,18494,-0.184,FALSE,FALSE,1,52.5,Car,prefers morning
+ID0124,Site_B,2025-06-02,34,Female,Metro,Certificate/Diploma,,68472,-1.455,TRUE,FALSE,3,54.6,Walk,
+ID0125,Site_A,2025-03-09,44,Other,Metro,Certificate/Diploma,26.4,153434,0.171,FALSE,TRUE,1,48.2,Car,prefers afternoon
+ID0126,Site_E,2024-11-29,70,Male,Metro,Certificate/Diploma,21.1,110812,-1.296,FALSE,FALSE,2,47.8,Public transport,prefers afternoon
+ID0127,Site_F,2025-01-28,59,Female,Metro,Year 10 or less,26.2,145607,-0.165,FALSE,FALSE,2,68,Other,prefers afternoon
+ID0128,Site_B,2023-02-18,40,Female,Metro,Certificate/Diploma,23.5,39485,0.438,FALSE,FALSE,4,68.1,Car,no notes
+ID0129,Site_B,2025-02-28,30,Female,Metro,Certificate/Diploma,25.9,88895,-1.304,FALSE,FALSE,3,55.2,Walk,no notes
+ID0130,Site_F,2023-07-03,67,Male,Regional,Year 10 or less,23.6,31781,1.692,FALSE,FALSE,2,58.6,Car,prefers morning
+ID0131,Site_B,2023-06-18,49,Male,Regional,Year 10 or less,,34831,-0.058,TRUE,TRUE,2,58.6,Walk,
+ID0132,Site_B,2023-04-18,51,Female,Metro,Certificate/Diploma,26.6,16687,-0.833,FALSE,TRUE,0,39.8,Car,no notes
+ID0133,Site_A,2024-12-03,38,Female,Metro,Year 10 or less,39,39156,1.421,FALSE,TRUE,3,25,Car,prefers morning
+ID0134,Site_C,2023-09-07,18,Male,Metro,Year 12,29.4,65072,1.103,TRUE,FALSE,2,43.6,Car,prefers morning
+ID0135,Site_B,2023-06-11,22,Male,Metro,Bachelor+,35,68027,-1.201,FALSE,FALSE,3,49.8,Car,needs interpreter
+ID0136,Site_A,2023-09-05,30,Male,Metro,Year 10 or less,12.7,50321,0.064,FALSE,FALSE,2,55.5,Car,
+ID0137,Site_C,2024-04-19,46,Female,Regional,Postgrad,29.6,36548,-0.084,FALSE,FALSE,3,59.9,Car,no notes
+ID0138,Site_A,2023-12-31,31,Male,Remote,Postgrad,30.6,51938,-1.398,FALSE,FALSE,3,69.9,Car,no notes
+ID0139,Site_F,2024-08-04,29,Female,Metro,Bachelor+,21.7,52063,-0.089,FALSE,FALSE,1,39.3,Car,no notes
+ID0140,Site_D,2023-07-13,45,Male,Metro,Year 12,22,42078,0.422,FALSE,FALSE,4,53.4,Car,prefers afternoon
+ID0141,Site_B,2024-03-05,23,Female,Metro,Certificate/Diploma,31.3,59715,0.989,FALSE,FALSE,1,46,Car,no notes
+ID0142,Site_F,2024-05-17,44,Female,Metro,Bachelor+,32.5,88587,-0.761,FALSE,FALSE,5,59.2,Car,no notes
+ID0143,Site_D,2025-06-01,23,Female,Metro,Year 10 or less,31.6,64922,-1.996,FALSE,FALSE,6,48.2,Walk,no notes
+ID0144,Site_E,2023-04-29,22,Female,Remote,Year 10 or less,29.3,,1.01,FALSE,FALSE,5,48,Car,no notes
+ID0145,Site_B,2025-02-14,25,Female,Metro,Bachelor+,25.8,61680,-1.148,FALSE,TRUE,1,44.2,Car,
+ID0146,Site_E,2024-01-26,64,Female,Metro,Year 10 or less,28.8,38817,-0.897,FALSE,FALSE,0,43.1,Car,prefers afternoon
+ID0147,Site_A,2023-12-14,43,Female,Metro,Postgrad,33.6,128537,0.965,FALSE,FALSE,2,71.3,Public transport,no notes
+ID0148,Site_B,2023-09-30,38,Male,Regional,Year 10 or less,23.7,67873,0.165,FALSE,FALSE,3,59.8,Car,needs interpreter
+ID0149,Site_D,2024-09-12,31,Male,Regional,Year 12,32.6,124566,-1.567,FALSE,FALSE,1,49.4,Car,no notes
+ID0150,Site_C,2023-01-03,37,Male,Metro,Year 12,31.8,51339,0.483,TRUE,FALSE,2,44.3,Car,no notes
+ID0151,Site_D,2024-03-31,47,Male,Metro,Bachelor+,29.8,93721,0.413,FALSE,FALSE,3,52.1,Car,needs interpreter
+ID0152,Site_C,2023-11-22,18,Male,Metro,Bachelor+,29.8,51440,-0.643,FALSE,FALSE,3,52.4,Car,no notes
+ID0153,Site_B,2025-01-18,34,Male,Remote,Certificate/Diploma,21.1,,1.442,TRUE,TRUE,3,45.6,Car,no notes
+ID0154,Site_D,2023-07-02,50,Female,Regional,Certificate/Diploma,33.8,32867,0.084,FALSE,TRUE,4,53.4,Car,prefers afternoon
+ID0155,Site_C,2023-12-27,36,Female,Metro,Year 12,17.1,56008,0.059,FALSE,TRUE,0,53.3,Car,no notes
+ID0156,Site_F,2024-03-08,46,Male,Metro,Certificate/Diploma,21.3,134376,2.133,FALSE,TRUE,3,50.5,Car,no notes
+ID0157,Site_C,2024-08-27,74,Male,Metro,Certificate/Diploma,26.8,66050,0.261,FALSE,TRUE,1,52.5,Car,no notes
+ID0158,Site_E,2024-06-30,57,Female,Metro,Year 12,26,67749,-0.814,FALSE,FALSE,3,58,Other,prefers morning
+ID0159,Site_A,2025-06-18,58,Female,Metro,Postgrad,25.8,98559,1.409,FALSE,FALSE,1,50.1,Car,prefers afternoon
+ID0160,Site_D,2023-11-18,41,Female,Metro,Year 10 or less,17.8,94393,0.458,TRUE,FALSE,2,55.4,Car,prefers afternoon
+ID0161,Site_F,2024-12-01,49,Female,Metro,Certificate/Diploma,21.9,78940,1.026,FALSE,FALSE,2,51.7,Car,no notes
+ID0162,Site_E,2023-03-29,60,Male,Metro,Year 12,18.4,77954,0.416,FALSE,TRUE,3,57.4,Bike,prefers afternoon
+ID0163,Site_A,2025-01-28,62,Male,Metro,Bachelor+,31.5,55149,0.195,FALSE,FALSE,1,68.3,Bike,no notes
+ID0164,Site_A,2023-02-03,37,Other,Metro,Certificate/Diploma,29,54042,-1.769,FALSE,TRUE,2,56,Bike,no notes
+ID0165,Site_E,2023-10-14,54,Male,Regional,Certificate/Diploma,26.6,37666,0.891,FALSE,FALSE,2,66.2,Public transport,no notes
+ID0166,Site_F,2023-11-28,38,Female,Metro,Certificate/Diploma,24,128561,1.084,FALSE,TRUE,3,55,Bike,prefers afternoon
+ID0167,Site_A,2025-05-20,18,Female,Metro,Postgrad,31,31906,2.346,TRUE,TRUE,4,52.7,Walk,prefers afternoon
+ID0168,Site_B,2025-02-13,44,Female,Regional,Bachelor+,28.1,70342,0.132,FALSE,FALSE,4,70.9,Car,
+ID0169,Site_C,2024-11-09,31,Male,Metro,Bachelor+,25.6,63060,1.092,FALSE,FALSE,2,57.8,Car,no notes
+ID0170,Site_D,2023-07-13,51,Female,Metro,Year 10 or less,25.6,27756,-2.347,FALSE,FALSE,4,62.2,Car,no notes
+ID0171,Site_E,2025-01-06,47,Male,Metro,Postgrad,30.5,178526,1.793,FALSE,TRUE,0,60.3,Car,no notes
+ID0172,Site_B,2025-05-13,45,Female,Metro,Postgrad,,80986,0.447,TRUE,FALSE,6,60,Walk,no notes
+ID0173,Site_F,2023-07-15,45,Female,Regional,Year 10 or less,30.3,71878,0.506,FALSE,FALSE,2,55.4,Public transport,
+ID0174,Site_D,2024-07-11,36,Female,Regional,Certificate/Diploma,22.8,82186,-0.059,TRUE,FALSE,2,46.5,Car,no notes
+ID0175,Site_F,2024-04-09,32,Female,Metro,Bachelor+,24.3,39138,-1.166,TRUE,FALSE,2,58.6,Car,
+ID0176,Site_F,2024-03-04,64,Male,Metro,Year 12,31.1,57337,0.112,FALSE,FALSE,0,58.4,Walk,prefers morning
+ID0177,Site_C,2024-10-14,38,Female,Regional,Postgrad,20.6,295165,0.492,FALSE,FALSE,2,58,Car,no notes
+ID0178,Site_E,2024-06-02,63,Male,Metro,Year 12,29.2,33149,0.671,FALSE,TRUE,2,36.7,Car,no notes
+ID0179,Site_D,2024-02-27,33,Female,Metro,Bachelor+,20,31989,-0.066,FALSE,FALSE,1,57.4,Public transport,
+ID0180,Site_F,2023-09-14,50,Male,Regional,Certificate/Diploma,27.3,50135,0.565,FALSE,TRUE,2,56,Public transport,no notes
+ID0181,Site_F,2024-09-16,51,Female,Metro,Bachelor+,32,80425,0.184,FALSE,FALSE,3,70.7,Car,no notes
+ID0182,Site_C,2024-12-19,18,Female,Metro,Postgrad,33.6,24076,-0.033,FALSE,TRUE,3,50.1,Car,no notes
+ID0183,Site_D,2025-04-05,52,Male,Metro,Year 12,35.4,48524,-0.864,FALSE,FALSE,0,55.4,Car,
+ID0184,Site_B,2025-02-01,29,Female,Metro,Year 12,23.9,183033,0.237,FALSE,FALSE,2,51.6,Walk,prefers afternoon
+ID0185,Site_D,2023-08-02,21,Female,Metro,Year 10 or less,40.7,45432,-0.057,FALSE,FALSE,3,47.8,Car,no notes
+ID0186,Site_B,2025-05-29,18,Male,Regional,Certificate/Diploma,30.4,112252,-0.116,FALSE,FALSE,0,47.1,Public transport,no notes
+ID0187,Site_E,2023-08-22,30,Female,Metro,Year 12,27.2,92618,-1.681,TRUE,FALSE,3,35.5,Car,no notes
+ID0188,Site_B,2023-04-15,42,Male,Metro,Postgrad,34.4,88894,1.543,FALSE,FALSE,5,59.5,Bike,no notes
+ID0189,Site_F,2024-10-03,23,Male,Metro,Year 10 or less,27.5,110311,-0.699,FALSE,FALSE,6,43.2,Car,prefers morning
+ID0190,Site_C,2025-01-23,57,Female,Metro,Year 12,28.5,235867,-0.256,FALSE,TRUE,1,48,Walk,
+ID0191,Site_C,2024-10-06,38,Female,Metro,Year 12,27.3,50732,0.125,FALSE,TRUE,2,47.9,Bike,prefers morning
+ID0192,Site_D,2024-12-10,58,Male,Remote,Certificate/Diploma,31.6,118215,1.217,FALSE,TRUE,5,39,Walk,prefers morning
+ID0193,Site_F,2024-03-06,52,Male,Metro,Year 12,21.5,28671,-0.276,FALSE,TRUE,3,58.2,Car,
+ID0194,Site_B,2024-09-29,36,Female,Metro,Certificate/Diploma,32.1,57930,-0.24,FALSE,FALSE,3,54.4,Car,no notes
+ID0195,Site_A,2025-02-03,31,Female,Regional,Year 12,28.8,41175,0.198,FALSE,FALSE,4,52.2,Other,no notes
+ID0196,Site_F,2024-10-20,33,Female,Metro,Bachelor+,24.7,39522,-1.469,FALSE,FALSE,2,65.1,Car,prefers afternoon
+ID0197,Site_A,2023-12-01,55,Other,Metro,Postgrad,30.7,95647,1.431,FALSE,FALSE,1,63.2,Car,no notes
+ID0198,Site_A,2024-03-27,36,Male,Metro,Certificate/Diploma,21.6,102863,-0.83,FALSE,FALSE,2,47.4,Car,prefers morning
+ID0199,Site_D,2025-03-08,55,Male,Metro,Certificate/Diploma,25.4,139864,-1.056,FALSE,FALSE,2,57.5,Car,
+ID0200,Site_A,2024-11-17,52,Female,Metro,Postgrad,31.5,114041,2.292,FALSE,TRUE,2,44.3,Car,no notes
+ID0201,Site_F,2023-05-20,41,Female,Metro,Certificate/Diploma,30.4,136650,1.88,FALSE,TRUE,0,43.8,Car,prefers morning
+ID0202,Site_D,2024-03-15,48,Male,Remote,Year 10 or less,17.5,,0.359,FALSE,FALSE,3,37.5,Public transport,no notes
+ID0203,Site_A,2024-04-02,31,Male,Metro,Year 10 or less,25.2,84552,0.086,FALSE,FALSE,4,43,Car,prefers morning
+ID0204,Site_E,2024-08-20,42,Male,Metro,Year 12,27.1,70104,-0.194,FALSE,FALSE,2,64.7,Car,no notes
+ID0205,Site_C,2024-09-20,54,Female,Metro,Certificate/Diploma,30.6,82138,0.923,TRUE,FALSE,0,52.1,Public transport,prefers morning
+ID0206,Site_D,2024-09-17,52,Male,Metro,Year 12,31.5,87180,-0.325,FALSE,FALSE,0,57,Public transport,prefers morning
+ID0207,Site_A,2024-09-23,50,Female,Metro,Year 10 or less,27.2,71751,-0.557,FALSE,TRUE,6,41.3,Car,no notes
+ID0208,Site_E,2025-01-16,27,Female,Metro,Year 12,27.3,193082,1.939,FALSE,FALSE,5,43.8,Car,prefers afternoon
+ID0209,Site_A,2025-05-13,45,Female,Metro,Postgrad,19.4,52493,0.692,FALSE,FALSE,5,56.7,Car,no notes
+ID0210,Site_D,2025-05-18,19,Female,Metro,Year 10 or less,27.3,31477,0.188,FALSE,FALSE,3,49,Car,no notes
+ID0211,Site_A,2024-08-03,37,Male,Metro,Bachelor+,30.9,26182,0.07,TRUE,TRUE,2,59.5,Other,needs interpreter
+ID0212,Site_D,2023-12-23,53,Female,Metro,Certificate/Diploma,29.1,36978,0.17,TRUE,FALSE,1,53.6,Bike,
+ID0213,Site_A,2023-02-14,46,Female,Regional,Certificate/Diploma,26.5,51226,0.379,FALSE,FALSE,2,49.2,Public transport,
+ID0214,Site_F,2025-05-23,52,Female,Metro,Year 12,28.8,36730,0.791,FALSE,TRUE,2,50.9,Public transport,needs interpreter
+ID0215,Site_F,2025-04-05,50,Female,Metro,Certificate/Diploma,24.8,134880,0.583,TRUE,FALSE,3,52.9,Car,prefers afternoon
+ID0216,Site_E,2023-05-26,37,Female,Remote,Certificate/Diploma,26.4,30151,-1.163,FALSE,FALSE,1,51.2,Car,prefers morning
+ID0217,Site_A,2023-07-18,18,Female,Metro,Certificate/Diploma,21.8,44330,-0.758,FALSE,FALSE,1,54.3,Walk,prefers afternoon
+ID0218,Site_D,2023-06-28,53,Male,Metro,Bachelor+,25.5,89962,1.519,FALSE,FALSE,1,60.6,Public transport,
+ID0219,Site_B,2023-04-16,29,Female,Regional,Postgrad,31.1,86829,-0.597,FALSE,FALSE,2,54.2,Bike,no notes
+ID0220,Site_B,2023-05-06,55,Female,Regional,Year 12,31.1,46739,-0.687,TRUE,TRUE,1,52.8,Car,
+ID0221,Site_E,2024-12-15,26,Male,Metro,Year 10 or less,31.2,95226,-0.157,FALSE,FALSE,2,52,Car,no notes
+ID0222,Site_C,2024-12-12,47,Female,Metro,Year 12,33.4,26675,2.412,FALSE,TRUE,4,54.3,Public transport,prefers afternoon
+ID0223,Site_F,2023-09-24,26,Female,Regional,Postgrad,,27723,-0.305,TRUE,FALSE,2,61,Car,prefers morning
+ID0224,Site_D,2023-10-23,51,Female,Metro,Year 12,34.1,26199,0.735,TRUE,FALSE,4,53,Walk,no notes
+ID0225,Site_F,2023-11-08,39,Male,Metro,Year 12,18.9,72102,1.627,FALSE,FALSE,4,59.3,Other,no notes
+ID0226,Site_B,2023-10-20,45,Male,Metro,Bachelor+,26.7,55682,-0.444,FALSE,FALSE,2,57.2,Car,
+ID0227,Site_E,2023-12-13,32,Female,Metro,Year 10 or less,38.7,142239,-1.773,FALSE,TRUE,2,31.7,Car,no notes
+ID0228,Site_B,2025-03-06,42,Male,Metro,Certificate/Diploma,30.6,37748,-0.024,FALSE,TRUE,1,57.8,Bike,no notes
+ID0229,Site_D,2025-01-27,18,Female,Metro,Certificate/Diploma,,179247,-0.148,TRUE,FALSE,2,53.8,Public transport,prefers morning
+ID0230,Site_E,2023-05-19,57,Female,Metro,Year 10 or less,21.6,81693,-0.061,FALSE,TRUE,3,24,Car,needs interpreter
+ID0231,Site_A,2024-05-06,28,Male,Metro,Certificate/Diploma,31,86704,-2.024,TRUE,FALSE,4,59.5,Car,needs interpreter
+ID0232,Site_A,2024-05-01,40,Female,Metro,Certificate/Diploma,22,69839,-1.056,FALSE,FALSE,5,44.8,Public transport,needs interpreter
+ID0233,Site_D,2025-02-08,42,Male,Metro,Bachelor+,32.8,66702,-1.273,FALSE,FALSE,3,57.9,Car,prefers afternoon
+ID0234,Site_D,2025-02-18,24,Male,Metro,Certificate/Diploma,26.5,93183,0.924,FALSE,FALSE,2,56,Walk,prefers morning
+ID0235,Site_B,2023-09-05,18,Female,Regional,Year 10 or less,17.4,84072,0.289,TRUE,FALSE,3,55.6,Car,
+ID0236,Site_D,2024-01-11,36,Male,Metro,Certificate/Diploma,19.4,181965,1.135,FALSE,FALSE,2,47.8,Other,
+ID0237,Site_A,2024-03-16,45,Female,Metro,Year 10 or less,28,46563,1.424,FALSE,FALSE,1,50.6,Public transport,no notes
+ID0238,Site_C,2024-02-23,45,Male,Metro,Year 12,28.4,80336,0.021,TRUE,TRUE,3,41.3,Car,no notes
+ID0239,Site_D,2023-03-12,33,Female,Regional,Certificate/Diploma,32.6,56919,-0.778,FALSE,TRUE,4,31.9,Public transport,no notes
+ID0240,Site_C,2023-05-27,40,Female,Metro,Year 10 or less,23.7,119622,0.167,FALSE,TRUE,8,59,Car,prefers afternoon
+ID0241,Site_A,2023-11-19,72,Male,Regional,Certificate/Diploma,17.2,124856,0.925,TRUE,TRUE,2,58.3,Car,
+ID0242,Site_B,2023-04-27,44,Male,Metro,Year 10 or less,31.1,98190,0.918,TRUE,FALSE,2,50.5,Car,no notes
+ID0243,Site_B,2024-10-12,61,Female,Regional,Certificate/Diploma,35.2,44564,0.256,FALSE,FALSE,2,69.5,Car,no notes
+ID0244,Site_A,2024-05-17,49,Male,Metro,Year 12,27.8,39625,0.03,TRUE,TRUE,4,47.7,Car,no notes
+ID0245,Site_D,2024-10-04,30,Male,Regional,Year 12,28.1,129499,1.115,FALSE,FALSE,1,41.8,Car,no notes
+ID0246,Site_A,2024-05-21,48,Female,Metro,Bachelor+,26.3,45095,-0.518,FALSE,FALSE,4,56.4,Other,prefers morning
+ID0247,Site_B,2025-02-23,38,Female,Metro,Year 12,23.5,63013,-0.009,FALSE,FALSE,3,43.1,Car,prefers afternoon
+ID0248,Site_A,2023-07-02,18,Female,Regional,Certificate/Diploma,29.7,104794,0.653,FALSE,TRUE,1,48.5,Walk,no notes
+ID0249,Site_C,2024-10-15,44,Female,Metro,Year 12,31.1,55225,-0.23,FALSE,FALSE,6,61.8,Public transport,prefers afternoon
+ID0250,Site_B,2023-11-06,40,Female,Metro,Bachelor+,27.3,28992,0.842,FALSE,FALSE,6,71,Bike,no notes
+ID0251,Site_D,2023-01-03,49,Female,Metro,Certificate/Diploma,27.5,61188,0.766,FALSE,FALSE,0,52.6,Car,
+ID0252,Site_B,2024-05-21,53,Female,Metro,Certificate/Diploma,30.3,81299,-1.218,FALSE,FALSE,4,60.7,Public transport,
+ID0253,Site_F,2025-03-28,44,Female,Metro,Bachelor+,29,51919,-0.045,TRUE,FALSE,2,61.5,Car,no notes
+ID0254,Site_A,2024-07-01,61,Female,Metro,Certificate/Diploma,23.7,76746,-0.051,FALSE,FALSE,3,68.5,Car,
+ID0255,Site_B,2024-10-11,31,Female,Metro,Year 12,28.7,105574,-0.204,FALSE,FALSE,2,56.3,Walk,prefers morning
+ID0256,Site_C,2024-06-24,52,Other,Regional,Year 12,36.6,75305,0.533,FALSE,FALSE,3,48.4,Car,needs interpreter
+ID0257,Site_E,2023-03-23,41,Female,Remote,Year 10 or less,28.1,53357,-0.908,FALSE,FALSE,4,60.7,Car,prefers afternoon
+ID0258,Site_C,2024-02-11,37,Female,Metro,Certificate/Diploma,24.8,82095,1.118,TRUE,TRUE,3,58.5,Car,prefers morning
+ID0259,Site_E,2025-06-08,40,Male,Regional,Bachelor+,26.2,147859,0.008,FALSE,FALSE,4,56.6,Car,no notes
+ID0260,Site_A,2024-06-26,41,Male,Metro,Year 12,35,130257,0.425,FALSE,FALSE,2,51.7,Car,
+ID0261,Site_E,2024-10-15,58,Female,Metro,Bachelor+,36.5,86803,-1.132,FALSE,FALSE,3,71,Car,no notes
+ID0262,Site_A,2024-03-22,37,Male,Metro,Certificate/Diploma,25.4,63586,-0.436,FALSE,FALSE,1,62.3,Car,no notes
+ID0263,Site_A,2025-04-01,52,Male,Metro,Year 12,36.6,91781,-0.624,FALSE,FALSE,1,69.2,Other,
+ID0264,Site_A,2023-05-28,51,Female,Metro,Year 12,34.2,33510,0.498,FALSE,FALSE,2,56.6,Public transport,no notes
+ID0265,Site_C,2023-04-30,52,Female,Regional,Bachelor+,25.4,145572,-0.182,FALSE,FALSE,1,76.8,Car,no notes
+ID0266,Site_B,2025-02-01,57,Male,Metro,Certificate/Diploma,32.6,71359,0.349,TRUE,TRUE,1,45.9,Public transport,prefers afternoon
+ID0267,Site_E,2023-08-28,50,Female,Regional,Postgrad,23.4,25107,1.17,FALSE,FALSE,6,66,Car,no notes
+ID0268,Site_D,2023-08-12,29,Female,Metro,Year 10 or less,21.7,53994,-0.64,FALSE,FALSE,3,58.5,Car,prefers morning
+ID0269,Site_C,2024-03-16,23,Male,Metro,Year 10 or less,26.2,37602,-0.847,FALSE,TRUE,1,53.4,Car,prefers morning
+ID0270,Site_B,2025-04-06,54,Female,Metro,Year 12,28.3,223548,0.154,FALSE,TRUE,2,50.2,Car,no notes
+ID0271,Site_D,2024-03-18,18,Female,Metro,Certificate/Diploma,25.4,85772,-0.254,FALSE,FALSE,4,40.2,Car,no notes
+ID0272,Site_E,2024-12-29,34,Female,Metro,Year 12,19.5,34715,-0.07,FALSE,TRUE,0,50.9,Other,no notes
+ID0273,Site_D,2023-04-07,43,Female,Metro,Certificate/Diploma,29.1,62746,-1.272,FALSE,TRUE,1,45.3,Walk,no notes
+ID0274,Site_B,2024-02-05,35,Female,Metro,Year 10 or less,22.2,46179,-0.363,FALSE,FALSE,1,54.8,Other,no notes
+ID0275,Site_E,2023-08-10,32,Female,Metro,Year 10 or less,21.8,45315,1.818,FALSE,FALSE,4,42.1,Walk,
+ID0276,Site_C,2023-10-02,21,Male,Metro,Bachelor+,36.8,27362,-0.162,FALSE,FALSE,2,65.3,Car,prefers afternoon
+ID0277,Site_F,2023-02-03,50,Female,Metro,Postgrad,33.1,71197,1.057,FALSE,TRUE,0,65.1,Car,prefers afternoon
+ID0278,Site_D,2024-05-07,42,Female,Metro,Year 10 or less,33.3,69785,-0.416,FALSE,TRUE,2,33.5,Car,prefers afternoon
+ID0279,Site_D,2024-11-13,19,Male,Metro,Postgrad,18.5,46995,0.953,FALSE,FALSE,3,56.2,Car,no notes
+ID0280,Site_B,2023-05-22,48,Male,Metro,Year 10 or less,34,83035,-0.939,FALSE,TRUE,0,40.8,Walk,prefers afternoon
+ID0281,Site_C,2023-08-29,42,Female,Metro,Year 12,18.7,66929,0.006,FALSE,TRUE,2,41.7,Public transport,prefers afternoon
+ID0282,Site_F,2024-11-22,35,Male,Remote,Year 10 or less,28.4,67127,0.476,FALSE,FALSE,0,48.4,Public transport,no notes
+ID0283,Site_F,2024-03-16,54,Male,Metro,Year 12,21.8,126059,0.532,FALSE,FALSE,2,42.9,Walk,no notes
+ID0284,Site_C,2023-03-18,52,Male,Metro,Certificate/Diploma,30,108107,-1.327,FALSE,TRUE,6,42.7,Public transport,
+ID0285,Site_D,2024-09-22,21,Male,Metro,Year 10 or less,22.6,78852,1.05,FALSE,TRUE,0,42.5,Walk,no notes
+ID0286,Site_C,2024-07-25,37,Male,Metro,Bachelor+,21.5,67548,0.627,FALSE,FALSE,5,51.4,Walk,prefers morning
+ID0287,Site_E,2023-12-27,34,Female,Metro,Bachelor+,28.6,95996,-0.699,FALSE,FALSE,3,63,Public transport,
+ID0288,Site_C,2025-04-22,51,Male,Regional,Year 12,30.7,44862,-1.203,FALSE,FALSE,2,45.6,Car,prefers morning
+ID0289,Site_E,2023-12-13,56,Female,Metro,Year 10 or less,22.6,21666,-0.218,TRUE,FALSE,3,46.2,Public transport,
+ID0290,Site_E,2025-05-23,42,Male,Metro,Certificate/Diploma,31.1,57418,0.45,FALSE,FALSE,4,58.5,Car,prefers afternoon
+ID0291,Site_A,2024-09-09,48,Male,Metro,Year 12,26.9,44449,1.091,TRUE,FALSE,1,45.5,Car,
+ID0292,Site_D,2025-06-10,23,Female,Metro,Year 10 or less,18.3,49828,-0.194,FALSE,TRUE,0,36.7,Public transport,no notes
+ID0293,Site_F,2024-04-30,33,Female,Metro,Year 12,32.7,48187,-0.81,FALSE,FALSE,2,60.2,Car,prefers afternoon
+ID0294,Site_F,2024-03-04,26,Male,Metro,Year 12,24.3,44989,-0.711,TRUE,FALSE,2,74.6,Other,no notes
+ID0295,Site_C,2023-12-08,41,Female,Metro,Bachelor+,38.3,144994,-0.664,FALSE,FALSE,2,71.2,Car,no notes
+ID0296,Site_C,2024-03-09,43,Female,Regional,Certificate/Diploma,34.1,51633,0.2,FALSE,FALSE,1,48.1,Car,prefers morning
+ID0297,Site_A,2024-12-25,43,Female,Metro,Year 12,13.9,56818,-0.02,FALSE,TRUE,4,69,Car,no notes
+ID0298,Site_F,2024-10-17,45,Male,Metro,Certificate/Diploma,21,57098,-0.42,FALSE,FALSE,3,63.4,Car,prefers morning
+ID0299,Site_A,2024-12-01,45,Male,Metro,Year 12,25.1,24335,0.938,FALSE,FALSE,4,41.9,Walk,
+ID0300,Site_B,2023-11-16,40,Female,Metro,Certificate/Diploma,25,54014,-0.051,FALSE,TRUE,3,42.4,Public transport,prefers morning
