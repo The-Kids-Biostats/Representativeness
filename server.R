@@ -138,6 +138,115 @@ server <- function(input, output, session) {
       )
   })
 
+  default_bucket_assignments <- shiny::reactive({
+    shiny::req(combined_data())
+    shiny::req(input$id_var)
+    defaults <- default_var_types(combined_data(), input$id_var)
+    list(
+      numeric = defaults$numeric,
+      categorical = c(defaults$categorical, defaults$date, defaults$ordinal)
+    )
+  })
+
+  output$var_type_manager_ui <- shiny::renderUI({
+    shiny::req(default_bucket_assignments())
+    defaults <- default_bucket_assignments()
+
+    numeric_vars <- if (is.null(input$var_types_numeric)) defaults$numeric else input$var_types_numeric
+    categorical_vars <- if (is.null(input$var_types_categorical)) {
+      defaults$categorical
+    } else {
+      input$var_types_categorical
+    }
+
+    sortable::bucket_list(
+      header = NULL,
+      group_name = "var-types",
+      orientation = "horizontal",
+      sortable::add_rank_list(
+        text = "Numeric",
+        labels = numeric_vars,
+        input_id = "var_types_numeric"
+      ),
+      sortable::add_rank_list(
+        text = "Categorical",
+        labels = categorical_vars,
+        input_id = "var_types_categorical"
+      )
+    )
+  })
+
+  output$var_type_notes_ui <- shiny::renderUI({
+    shiny::req(combined_data())
+    shiny::req(input$id_var)
+    defaults <- default_var_types(combined_data(), input$id_var)
+    notes <- list()
+
+    if (length(defaults$date) > 0) {
+      notes <- c(
+        notes,
+        list(
+          shiny::tags$li(
+            shiny::strong("Date/time detected: "),
+            paste(defaults$date, collapse = ", ")
+          )
+        )
+      )
+    }
+
+    if (length(defaults$ordinal) > 0) {
+      notes <- c(
+        notes,
+        list(
+          shiny::tags$li(
+            shiny::strong("Ordinal detected: "),
+            paste(defaults$ordinal, collapse = ", ")
+          )
+        )
+      )
+    }
+
+    if (length(notes) == 0) return(NULL)
+
+    shiny::tags$div(
+      shiny::tags$hr(),
+      shiny::tags$p("Other detected variable types:"),
+      shiny::tags$ul(notes)
+    )
+  })
+
+  var_type_map <- shiny::reactive({
+    shiny::req(combined_data())
+    shiny::req(input$id_var)
+    defaults <- default_var_types(combined_data(), input$id_var)
+    vars <- setdiff(names(combined_data()), c(input$id_var, ".included"))
+
+    type_map <- setNames(rep("categorical", length(vars)), vars)
+    type_map[defaults$numeric] <- "numeric"
+    type_map[defaults$date] <- "date"
+    type_map[defaults$ordinal] <- "ordinal"
+
+    if (!is.null(input$var_types_numeric) || !is.null(input$var_types_categorical)) {
+      default_bucket <- setNames(rep("categorical", length(vars)), vars)
+      default_bucket[defaults$numeric] <- "numeric"
+
+      bucket_override <- default_bucket
+      if (!is.null(input$var_types_numeric)) {
+        bucket_override[intersect(input$var_types_numeric, vars)] <- "numeric"
+      }
+      if (!is.null(input$var_types_categorical)) {
+        bucket_override[intersect(input$var_types_categorical, vars)] <- "categorical"
+      }
+
+      moved <- bucket_override != default_bucket
+      for (v in names(bucket_override)[moved]) {
+        type_map[v] <- bucket_override[v]
+      }
+    }
+
+    type_map
+  })
+
   balance_table_numeric_data <- shiny::reactive({
     shiny::req(combined_data())
     shiny::req(input$id_var)
@@ -145,13 +254,11 @@ server <- function(input, output, session) {
     dat <- combined_data()
     id_var <- input$id_var
 
-    vars <- setdiff(names(dat), c(id_var, ".included"))
+    vars <- names(var_type_map())[var_type_map() == "numeric"]
 
     res <- purrr::map_dfr(vars, function(v) {
-      x <- dat[[v]]
+      x <- coerce_numeric(dat[[v]])
       inc <- dat$.included
-
-      if (!is.numeric(x)) return(NULL)
 
       miss_in <- mean(is.na(x[inc == "Included"]))
       miss_out <- mean(is.na(x[inc == "Not included"]))
@@ -187,13 +294,11 @@ server <- function(input, output, session) {
     dat <- combined_data()
     id_var <- input$id_var
 
-    vars <- setdiff(names(dat), c(id_var, ".included"))
+    vars <- names(var_type_map())[var_type_map() != "numeric"]
 
     res <- purrr::map_dfr(vars, function(v) {
       x <- dat[[v]]
       inc <- dat$.included
-
-      if (is.numeric(x)) return(NULL)
 
       miss_in <- mean(is.na(x[inc == "Included"]))
       miss_out <- mean(is.na(x[inc == "Not included"]))
@@ -255,13 +360,15 @@ server <- function(input, output, session) {
   output$dist_plot <- shiny::renderPlot({
     shiny::req(combined_data())
     shiny::req(input$var)
-    make_var_plot(combined_data(), input$var, input$missing_as_level)
+    var_type <- var_type_map()[[input$var]]
+    make_var_plot(combined_data(), input$var, input$missing_as_level, var_type = var_type)
   })
 
   output$summary_table <- shiny::renderTable({
     shiny::req(combined_data())
     shiny::req(input$var)
-    make_var_summary(combined_data(), input$var, input$missing_as_level)
+    var_type <- var_type_map()[[input$var]]
+    make_var_summary(combined_data(), input$var, input$missing_as_level, var_type = var_type)
   })
 
   output$download_report <- shiny::downloadHandler(
@@ -278,6 +385,7 @@ server <- function(input, output, session) {
         balance_numeric = balance_table_numeric_data(),
         balance_categorical = balance_table_categorical_data(),
         combined = combined_data(),
+        var_type_map = var_type_map(),
         include_drilldowns = isTRUE(input$report_include_drilldowns),
         vars = if (!is.null(input$report_vars)) input$report_vars else character(0)
       )
