@@ -121,6 +121,14 @@ ui <- shiny::fluidPage(
           shiny::tableOutput("balance_table_categorical")
         ),
         shiny::tabPanel(
+          "Variable types",
+          shiny::p(
+            "Review the detected variable types. Drag variables between boxes to override their type."
+          ),
+          shiny::uiOutput("var_type_manager_ui"),
+          shiny::uiOutput("var_type_notes_ui")
+        ),
+        shiny::tabPanel(
           "Drilldown",
           shiny::h3(shiny::textOutput("var_title")),
           shiny::plotOutput("dist_plot", height = 420),

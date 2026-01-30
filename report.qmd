@@ -48,6 +48,7 @@ balance_numeric <- payload$balance_numeric
 balance_categorical <- payload$balance_categorical
 dat <- payload$combined
 vars <- payload$vars
+var_type_map <- payload$var_type_map
 missing_as_level <- isTRUE(payload$missing_as_level)
 ```
 
@@ -57,11 +58,14 @@ plot_theme <- function() {
   if (exists("theme_thekids", mode = "function")) theme_thekids() else theme_minimal()
 }
 
-make_var_plot <- function(dat, var_name, missing_as_level = TRUE) {
+make_var_plot <- function(dat, var_name, missing_as_level = TRUE, var_type = NULL) {
   x <- dat[[var_name]]
+  resolved_type <- if (!is.null(var_type)) var_type else if (is.numeric(x)) "numeric" else "categorical"
   
-  if (is.numeric(x)) {
-    ggplot(dat, aes(x = .data[[var_name]], fill = .included)) +
+  if (resolved_type == "numeric") {
+    dat <- dat %>%
+      mutate(.x = suppressWarnings(as.numeric(as.character(.data[[var_name]]))))
+    ggplot(dat, aes(x = .x, fill = .included)) +
       geom_density(alpha = 0.35, na.rm = TRUE) +
       labs(x = var_name, y = "Density", fill = "") +
       theme_thekids()
@@ -82,20 +86,22 @@ make_var_plot <- function(dat, var_name, missing_as_level = TRUE) {
 ```
 
 ```{r}
-make_var_summary <- function(dat, var_name, missing_as_level = TRUE) {
+make_var_summary <- function(dat, var_name, missing_as_level = TRUE, var_type = NULL) {
   x <- dat[[var_name]]
+  resolved_type <- if (!is.null(var_type)) var_type else if (is.numeric(x)) "numeric" else "categorical"
   
-  if (is.numeric(x)) {
+  if (resolved_type == "numeric") {
     dat %>%
+      mutate(.x = suppressWarnings(as.numeric(as.character(.data[[var_name]])))) %>%
       group_by(.included) %>%
       summarise(
-        N = sum(!is.na(.data[[var_name]])),
-        Missing = round(100 * mean(is.na(.data[[var_name]])), 1),
-        Mean = mean(.data[[var_name]], na.rm = TRUE),
-        SD = sd(.data[[var_name]], na.rm = TRUE),
-        Median = median(.data[[var_name]], na.rm = TRUE),
-        Q1 = quantile(.data[[var_name]], 0.25, na.rm = TRUE),
-        Q3 = quantile(.data[[var_name]], 0.75, na.rm = TRUE),
+        N = sum(!is.na(.x)),
+        Missing = round(100 * mean(is.na(.x)), 1),
+        Mean = mean(.x, na.rm = TRUE),
+        SD = sd(.x, na.rm = TRUE),
+        Median = median(.x, na.rm = TRUE),
+        Q1 = quantile(.x, 0.25, na.rm = TRUE),
+        Q3 = quantile(.x, 0.75, na.rm = TRUE),
         .groups = "drop"
       )
   } else {
@@ -160,11 +166,11 @@ if (!isTRUE(payload$include_drilldowns)) {
 } else {
   for (v in vars) {
     cat("\n\n## ", v, "\n", sep = "")
-    print(make_var_plot(dat, v, missing_as_level))
+    var_type <- if (!is.null(var_type_map)) var_type_map[[v]] else NULL
+    print(make_var_plot(dat, v, missing_as_level, var_type = var_type))
     cat("\n\n")
-    make_var_summary(dat, v, missing_as_level) %>%
+    make_var_summary(dat, v, missing_as_level, var_type = var_type) %>%
       thekids_table(colour = "MidnightBlue", padding = 0.2)
   }
 }
 ```
-
