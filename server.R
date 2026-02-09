@@ -304,10 +304,6 @@ server <- function(input, output, session) {
       miss_out <- mean(is.na(x[inc == "Not included"]))
 
       xx <- as.factor(x)
-      if (isTRUE(input$missing_as_level)) {
-        xx <- forcats::fct_explicit_na(xx, na_level = "(Missing)")
-      }
-
       pval <- safe_fisher_p(inc, xx)
 
       tibble::tibble(
@@ -361,14 +357,14 @@ server <- function(input, output, session) {
     shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_plot(combined_data(), input$var, input$missing_as_level, var_type = var_type)
+    make_var_plot(combined_data(), input$var, var_type = var_type)
   })
 
   output$summary_table <- shiny::renderTable({
     shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_summary(combined_data(), input$var, input$missing_as_level, var_type = var_type)
+    make_var_summary(combined_data(), input$var, var_type = var_type)
   })
 
   output$download_report <- shiny::downloadHandler(
@@ -381,7 +377,6 @@ server <- function(input, output, session) {
       payload <- list(
         generated_on = Sys.time(),
         id_var = input$id_var,
-        missing_as_level = isTRUE(input$missing_as_level),
         balance_numeric = balance_table_numeric_data(),
         balance_categorical = balance_table_categorical_data(),
         combined = combined_data(),

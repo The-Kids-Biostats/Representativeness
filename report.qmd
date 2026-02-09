@@ -38,7 +38,6 @@ callout-icon: false
 
 ```{r}
 library(thekidsbiostats)
-library(forcats)
 library(scales)
 library(knitr)
 
@@ -49,7 +48,6 @@ balance_categorical <- payload$balance_categorical
 dat <- payload$combined
 vars <- payload$vars
 var_type_map <- payload$var_type_map
-missing_as_level <- isTRUE(payload$missing_as_level)
 ```
 
 
@@ -58,7 +56,7 @@ plot_theme <- function() {
   if (exists("theme_thekids", mode = "function")) theme_thekids() else theme_minimal()
 }
 
-make_var_plot <- function(dat, var_name, missing_as_level = TRUE, var_type = NULL) {
+make_var_plot <- function(dat, var_name, var_type = NULL) {
   x <- dat[[var_name]]
   resolved_type <- if (!is.null(var_type)) var_type else if (is.numeric(x)) "numeric" else "categorical"
   
@@ -71,10 +69,7 @@ make_var_plot <- function(dat, var_name, missing_as_level = TRUE, var_type = NUL
       theme_thekids()
   } else {
     dat2 <- dat %>%
-      mutate(
-        .x = as.factor(.data[[var_name]]),
-        .x = if (isTRUE(missing_as_level)) forcats::fct_explicit_na(.x, "(Missing)") else .x
-      )
+      mutate(.x = as.factor(.data[[var_name]]))
     
     ggplot(dat2, aes(x = .included, fill = .x)) +
       geom_bar(position = "fill") +
@@ -86,7 +81,7 @@ make_var_plot <- function(dat, var_name, missing_as_level = TRUE, var_type = NUL
 ```
 
 ```{r}
-make_var_summary <- function(dat, var_name, missing_as_level = TRUE, var_type = NULL) {
+make_var_summary <- function(dat, var_name, var_type = NULL) {
   x <- dat[[var_name]]
   resolved_type <- if (!is.null(var_type)) var_type else if (is.numeric(x)) "numeric" else "categorical"
   
@@ -103,13 +98,15 @@ make_var_summary <- function(dat, var_name, missing_as_level = TRUE, var_type = 
         Q1 = quantile(.x, 0.25, na.rm = TRUE),
         Q3 = quantile(.x, 0.75, na.rm = TRUE),
         .groups = "drop"
+      ) %>%
+      tidyr::pivot_wider(
+        names_from = .included,
+        values_from = c(N, `Missing %`, Mean, SD, Median, Q1, Q3),
+        names_glue = "{.value} ({.included})"
       )
   } else {
     dat2 <- dat %>%
-      mutate(
-        .x = as.factor(.data[[var_name]]),
-        .x = if (isTRUE(missing_as_level)) forcats::fct_explicit_na(.x, "(Missing)") else .x
-      )
+      mutate(.x = as.factor(.data[[var_name]]))
     
     dat2 %>%
       count(.included, .x) %>%
@@ -117,7 +114,12 @@ make_var_summary <- function(dat, var_name, missing_as_level = TRUE, var_type = 
       mutate(Percent = round(100 * n / sum(n), 1)) %>%
       ungroup() %>%
       rename(Level = .x, N = n) %>%
-      arrange(.included, desc(N))
+      tidyr::pivot_wider(
+        names_from = .included,
+        values_from = c(N, Percent),
+        names_glue = "{.value} ({.included})"
+      ) %>%
+      arrange(desc(`N (Included)`))
     
   }
 }
@@ -128,7 +130,6 @@ make_var_summary <- function(dat, var_name, missing_as_level = TRUE, var_type = 
 ```{r}
 cat("Generated on:", format(payload$generated_on), "\n")
 cat("ID variable:", payload$id_var, "\n")
-cat("Missing treated as level (categorical):", missing_as_level, "\n")
 cat("Drilldowns included:", isTRUE(payload$include_drilldowns), "\n")
 ```
 
@@ -167,9 +168,9 @@ if (!isTRUE(payload$include_drilldowns)) {
   for (v in vars) {
     cat("\n\n## ", v, "\n", sep = "")
     var_type <- if (!is.null(var_type_map)) var_type_map[[v]] else NULL
-    print(make_var_plot(dat, v, missing_as_level, var_type = var_type))
+    print(make_var_plot(dat, v, var_type = var_type))
     cat("\n\n")
-    make_var_summary(dat, v, missing_as_level, var_type = var_type) %>%
+    make_var_summary(dat, v, var_type = var_type) %>%
       thekids_table(colour = "MidnightBlue", padding = 0.2)
   }
 }
