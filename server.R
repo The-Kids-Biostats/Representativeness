@@ -376,56 +376,64 @@ server <- function(input, output, session) {
     content = function(file) {
       shiny::req(combined_data())
 
-      payload <- list(
-        generated_on = Sys.time(),
-        id_var = input$id_var,
-        balance_numeric = balance_table_numeric_data(),
-        balance_categorical = balance_table_categorical_data(),
-        combined = combined_data(),
-        var_type_map = var_type_map(),
-        include_drilldowns = isTRUE(input$report_include_drilldowns),
-        vars = if (!is.null(input$report_vars)) input$report_vars else character(0)
-      )
+      shiny::withProgress(message = "Preparing report...", value = 0, {
+        payload <- list(
+          generated_on = Sys.time(),
+          id_var = input$id_var,
+          balance_numeric = balance_table_numeric_data(),
+          balance_categorical = balance_table_categorical_data(),
+          combined = combined_data(),
+          var_type_map = var_type_map(),
+          include_drilldowns = isTRUE(input$report_include_drilldowns),
+          vars = if (!is.null(input$report_vars)) input$report_vars else character(0)
+        )
 
-      tmpdir <- tempfile("repcheck_")
-      dir.create(tmpdir, recursive = TRUE)
+        tmpdir <- tempfile("repcheck_")
+        dir.create(tmpdir, recursive = TRUE)
 
-      rds_path <- file.path(tmpdir, "payload.rds")
-      saveRDS(payload, rds_path)
+        rds_path <- file.path(tmpdir, "payload.rds")
+        saveRDS(payload, rds_path)
 
-      app_dir <- normalizePath(getShinyOption("appDir"), winslash = "/", mustWork = TRUE)
-      qmd_src <- file.path(app_dir, "report.qmd")
-      if (!file.exists(qmd_src)) stop("report.qmd not found at: ", qmd_src)
+        shiny::incProgress(0.2, detail = "Setting up report template...")
 
-      qmd_tmp <- file.path(tmpdir, "report.qmd")
-      file.copy(qmd_src, qmd_tmp, overwrite = TRUE)
+        app_dir <- normalizePath(getShinyOption("appDir"), winslash = "/", mustWork = TRUE)
+        qmd_src <- file.path(app_dir, "report.qmd")
+        if (!file.exists(qmd_src)) stop("report.qmd not found at: ", qmd_src)
 
-      ext_src <- file.path(app_dir, "_extensions")
-      ext_dst <- file.path(tmpdir, "_extensions")
+        qmd_tmp <- file.path(tmpdir, "report.qmd")
+        file.copy(qmd_src, qmd_tmp, overwrite = TRUE)
 
-      if (dir.exists(ext_src)) {
-        dir.create(ext_dst, recursive = TRUE, showWarnings = FALSE)
+        ext_src <- file.path(app_dir, "_extensions")
+        ext_dst <- file.path(tmpdir, "_extensions")
 
-        src_files <- list.files(ext_src, full.names = TRUE, all.files = TRUE, no.. = TRUE)
+        if (dir.exists(ext_src)) {
+          dir.create(ext_dst, recursive = TRUE, showWarnings = FALSE)
 
-        ok <- file.copy(src_files, ext_dst, recursive = TRUE, overwrite = TRUE)
-        if (!all(ok)) warning("Could not fully copy _extensions into temp render directory.")
-      } else {
-        warning("No _extensions folder found at: ", ext_src)
-      }
+          src_files <- list.files(ext_src, full.names = TRUE, all.files = TRUE, no.. = TRUE)
 
-      oldwd <- getwd()
-      on.exit(setwd(oldwd), add = TRUE)
-      setwd(tmpdir)
+          ok <- file.copy(src_files, ext_dst, recursive = TRUE, overwrite = TRUE)
+          if (!all(ok)) warning("Could not fully copy _extensions into temp render directory.")
+        } else {
+          warning("No _extensions folder found at: ", ext_src)
+        }
 
-      quarto::quarto_render(
-        input = qmd_tmp,
-        execute_params = list(payload_rds = rds_path),
-        output_file = "report.html",
-        quiet = FALSE
-      )
+        shiny::incProgress(0.6, detail = "Rendering report...")
 
-      file.copy(file.path(tmpdir, "report.html"), file, overwrite = TRUE)
+        oldwd <- getwd()
+        on.exit(setwd(oldwd), add = TRUE)
+        setwd(tmpdir)
+
+        quarto::quarto_render(
+          input = qmd_tmp,
+          execute_params = list(payload_rds = rds_path),
+          output_file = "report.html",
+          quiet = FALSE
+        )
+
+        shiny::incProgress(0.9, detail = "Finalizing download...")
+
+        file.copy(file.path(tmpdir, "report.html"), file, overwrite = TRUE)
+      })
     }
   )
 }
