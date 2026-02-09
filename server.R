@@ -147,33 +147,34 @@ server <- function(input, output, session) {
     )
   })
 
-  comparison_data <- shiny::reactive({
-    shiny::req(combined_data())
-    shiny::req(input$id_var)
-
-    base <- combined_data()
-    id_var <- input$id_var
-
-    if (!isTRUE(input$compare_to_population)) {
-      return(base)
+  comparison_values <- function(x, inc) {
+    if (isTRUE(input$compare_to_population)) {
+      list(
+        included = x[inc == "Included"],
+        comparison = x
+      )
+    } else {
+      list(
+        included = x[inc == "Included"],
+        comparison = x[inc == "Not included"]
+      )
     }
+  }
 
-    included_ids <- base %>%
-      dplyr::filter(.included == "Included") %>%
-      dplyr::distinct(.data[[id_var]]) %>%
-      dplyr::pull(.data[[id_var]])
+  comparison_data_for_var <- function(var_name) {
+    base <- combined_data()
+    inc <- base$.included
+    x <- base[[var_name]]
 
-    pop_all <- base %>%
-      dplyr::select(-.included) %>%
-      dplyr::mutate(.included = "Population")
-
-    pop_in <- base %>%
-      dplyr::filter(.data[[id_var]] %in% included_ids) %>%
-      dplyr::select(-.included) %>%
-      dplyr::mutate(.included = "Included")
-
-    dplyr::bind_rows(pop_all, pop_in)
-  })
+    if (isTRUE(input$compare_to_population)) {
+      tibble::tibble(
+        .included = c(rep("Included", sum(inc == "Included")), rep("Population", length(x))),
+        !!var_name := c(x[inc == "Included"], x)
+      )
+    } else {
+      base %>% dplyr::select(.included, !!var_name)
+    }
+  }
 
   default_bucket_assignments <- shiny::reactive({
     shiny::req(combined_data())
@@ -285,12 +286,10 @@ server <- function(input, output, session) {
   })
 
   balance_table_numeric_data <- shiny::reactive({
-    shiny::req(comparison_data())
+    shiny::req(combined_data())
     shiny::req(input$id_var)
 
-    dat <- comparison_data()
-    id_var <- input$id_var
-    labels <- comparison_labels()
+    dat <- combined_data()
 
     vars <- names(var_type_map())[var_type_map() == "numeric"]
 
@@ -298,18 +297,20 @@ server <- function(input, output, session) {
       x <- coerce_numeric(dat[[v]])
       inc <- dat$.included
 
-      miss_in <- mean(is.na(x[inc == labels$included]))
-      miss_out <- mean(is.na(x[inc == labels$comparison]))
+      groups <- comparison_values(x, inc)
 
-      pval_t <- safe_t_test_p(x[inc == labels$included], x[inc == labels$comparison])
-      pval_w <- safe_wilcox_p(x[inc == labels$included], x[inc == labels$comparison])
+      miss_in <- mean(is.na(groups$included))
+      miss_out <- mean(is.na(groups$comparison))
+
+      pval_t <- safe_t_test_p(groups$included, groups$comparison)
+      pval_w <- safe_wilcox_p(groups$included, groups$comparison)
 
       tibble::tibble(
         variable = v,
         missing_included = round(100 * miss_in, 1),
         missing_not_included = round(100 * miss_out, 1),
-        mean_included = mean(x[inc == labels$included], na.rm = TRUE),
-        mean_not_included = mean(x[inc == labels$comparison], na.rm = TRUE),
+        mean_included = mean(groups$included, na.rm = TRUE),
+        mean_not_included = mean(groups$comparison, na.rm = TRUE),
         p_ttest = pval_t,
         p_wilcox = pval_w
       )
@@ -326,12 +327,10 @@ server <- function(input, output, session) {
   })
 
   balance_table_categorical_data <- shiny::reactive({
-    shiny::req(comparison_data())
+    shiny::req(combined_data())
     shiny::req(input$id_var)
 
-    dat <- comparison_data()
-    id_var <- input$id_var
-    labels <- comparison_labels()
+    dat <- combined_data()
 
     vars <- names(var_type_map())[var_type_map() != "numeric"]
 
@@ -339,15 +338,25 @@ server <- function(input, output, session) {
       x <- dat[[v]]
       inc <- dat$.included
 
-      miss_in <- mean(is.na(x[inc == labels$included]))
-      miss_out <- mean(is.na(x[inc == labels$comparison]))
+      groups <- comparison_values(x, inc)
 
-      xx <- as.factor(x)
-      pval <- safe_fisher_p(inc, xx)
+      miss_in <- mean(is.na(groups$included))
+      miss_out <- mean(is.na(groups$comparison))
+
+      if (isTRUE(input$compare_to_population)) {
+        inc_vec <- c(
+          rep("Included", length(groups$included)),
+          rep("Population", length(groups$comparison))
+        )
+        x_vec <- c(groups$included, groups$comparison)
+        pval <- safe_fisher_p(inc_vec, as.factor(x_vec))
+      } else {
+        pval <- safe_fisher_p(inc, as.factor(x))
+      }
 
       tibble::tibble(
         variable = v,
-        n_levels = nlevels(xx),
+        n_levels = nlevels(as.factor(x)),
         missing_included = round(100 * miss_in, 1),
         missing_not_included = round(100 * miss_out, 1),
         p_value = pval
@@ -405,17 +414,19 @@ server <- function(input, output, session) {
   })
 
   output$dist_plot <- shiny::renderPlot({
-    shiny::req(comparison_data())
+    shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_plot(comparison_data(), input$var, var_type = var_type)
+    plot_data <- comparison_data_for_var(input$var)
+    make_var_plot(plot_data, input$var, var_type = var_type)
   })
 
   output$summary_table <- shiny::renderTable({
-    shiny::req(comparison_data())
+    shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_summary(comparison_data(), input$var, var_type = var_type)
+    summary_data <- comparison_data_for_var(input$var)
+    make_var_summary(summary_data, input$var, var_type = var_type)
   })
 
   output$download_report <- shiny::downloadHandler(
@@ -431,9 +442,10 @@ server <- function(input, output, session) {
           id_var = input$id_var,
           balance_numeric = balance_table_numeric_data(),
           balance_categorical = balance_table_categorical_data(),
-          combined = comparison_data(),
+          combined = combined_data(),
           var_type_map = var_type_map(),
           comparison_label = comparison_labels()$comparison,
+          compare_to_population = isTRUE(input$compare_to_population),
           include_drilldowns = isTRUE(input$report_include_drilldowns),
           vars = if (!is.null(input$report_vars)) input$report_vars else character(0)
         )
