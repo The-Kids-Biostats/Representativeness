@@ -176,6 +176,18 @@ server <- function(input, output, session) {
     }
   }
 
+  safe_fisher_population_p <- function(included, population) {
+    levels <- union(levels(as.factor(included)), levels(as.factor(population)))
+    inc_counts <- table(factor(included, levels = levels))
+    pop_counts <- table(factor(population, levels = levels))
+    tab <- rbind(Included = inc_counts, Population = pop_counts)
+
+    if (nrow(tab) < 2 || ncol(tab) < 2) return(NA_real_)
+
+    out <- tryCatch(stats::fisher.test(tab)$p.value, error = function(e) NA_real_)
+    as.numeric(out)
+  }
+
   default_bucket_assignments <- shiny::reactive({
     shiny::req(combined_data())
     shiny::req(input$id_var)
@@ -344,12 +356,7 @@ server <- function(input, output, session) {
       miss_out <- mean(is.na(groups$comparison))
 
       if (isTRUE(input$compare_to_population)) {
-        inc_vec <- c(
-          rep("Included", length(groups$included)),
-          rep("Population", length(groups$comparison))
-        )
-        x_vec <- c(groups$included, groups$comparison)
-        pval <- safe_fisher_p(inc_vec, as.factor(x_vec))
+        pval <- safe_fisher_population_p(groups$included, groups$comparison)
       } else {
         pval <- safe_fisher_p(inc, as.factor(x))
       }
