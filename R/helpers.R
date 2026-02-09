@@ -75,7 +75,7 @@ safe_fisher_p <- function(inc, x_factor) {
   as.numeric(out)
 }
 
-make_var_plot <- function(dat, var_name, missing_as_level = TRUE) {
+make_var_plot <- function(dat, var_name) {
   x <- dat[[var_name]]
 
   if (is.numeric(x)) {
@@ -85,14 +85,7 @@ make_var_plot <- function(dat, var_name, missing_as_level = TRUE) {
       thekidsbiostats::theme_thekids()
   } else {
     dat2 <- dat %>%
-      dplyr::mutate(
-        .x = as.factor(.data[[var_name]]),
-        .x = if (isTRUE(missing_as_level)) {
-          forcats::fct_explicit_na(.x, "(Missing)")
-        } else {
-          .x
-        }
-      )
+      dplyr::mutate(.x = as.factor(.data[[var_name]]))
 
     ggplot2::ggplot(dat2, ggplot2::aes(x = .included, fill = .x)) +
       ggplot2::geom_bar(position = "fill") +
@@ -103,7 +96,7 @@ make_var_plot <- function(dat, var_name, missing_as_level = TRUE) {
   }
 }
 
-make_var_summary <- function(dat, var_name, missing_as_level = TRUE) {
+make_var_summary <- function(dat, var_name) {
   x <- dat[[var_name]]
 
   if (is.numeric(x)) {
@@ -111,24 +104,22 @@ make_var_summary <- function(dat, var_name, missing_as_level = TRUE) {
       dplyr::group_by(.included) %>%
       dplyr::summarise(
         N = sum(!is.na(.data[[var_name]])),
-        Missing = round(100 * mean(is.na(.data[[var_name]])), 1),
+        `Missing %` = round(100 * mean(is.na(.data[[var_name]])), 1),
         Mean = mean(.data[[var_name]], na.rm = TRUE),
         SD = stats::sd(.data[[var_name]], na.rm = TRUE),
         Median = stats::median(.data[[var_name]], na.rm = TRUE),
         Q1 = stats::quantile(.data[[var_name]], 0.25, na.rm = TRUE),
         Q3 = stats::quantile(.data[[var_name]], 0.75, na.rm = TRUE),
         .groups = "drop"
+      ) %>%
+      tidyr::pivot_wider(
+        names_from = .included,
+        values_from = c(N, `Missing %`, Mean, SD, Median, Q1, Q3),
+        names_glue = "{.value} ({.included})"
       )
   } else {
     dat2 <- dat %>%
-      dplyr::mutate(
-        .x = as.factor(.data[[var_name]]),
-        .x = if (isTRUE(missing_as_level)) {
-          forcats::fct_explicit_na(.x, "(Missing)")
-        } else {
-          .x
-        }
-      )
+      dplyr::mutate(.x = as.factor(.data[[var_name]]))
 
     dat2 %>%
       dplyr::count(.included, .x) %>%
@@ -136,6 +127,11 @@ make_var_summary <- function(dat, var_name, missing_as_level = TRUE) {
       dplyr::mutate(Percent = round(100 * n / sum(n), 1)) %>%
       dplyr::ungroup() %>%
       dplyr::rename(Level = .x, N = n) %>%
-      dplyr::arrange(.included, dplyr::desc(N))
+      tidyr::pivot_wider(
+        names_from = .included,
+        values_from = c(N, Percent),
+        names_glue = "{.value} ({.included})"
+      ) %>%
+      dplyr::arrange(dplyr::desc(`N (Included)`))
   }
 }

@@ -87,17 +87,7 @@ ui <- shiny::fluidPage(
         shiny::actionButton("draw_sample", "Draw random sample")
       ),
       shiny::tags$hr(),
-      shiny::h4("3. Options"),
-      shiny::checkboxInput(
-        "missing_as_level",
-        "Treat missing values as a category (for categorical vars)",
-        value = TRUE
-      ),
-      shiny::tags$hr(),
-      shiny::h4("4. Variable to inspect"),
-      shiny::uiOutput("var_select_ui"),
-      shiny::tags$hr(),
-      shiny::h4("5. Report"),
+      shiny::h4("3. Report"),
       shiny::checkboxInput(
         "report_include_drilldowns",
         "Include drilldowns for selected variables",
@@ -122,6 +112,8 @@ ui <- shiny::fluidPage(
         ),
         shiny::tabPanel(
           "Drilldown",
+          shiny::uiOutput("var_select_ui"),
+          shiny::tags$hr(),
           shiny::h3(shiny::textOutput("var_title")),
           shiny::plotOutput("dist_plot", height = 420),
           shiny::tags$hr(),
