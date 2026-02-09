@@ -29,6 +29,12 @@ read_any <- function(path) {
 is_dateish <- function(x) inherits(x, c("Date", "POSIXct", "POSIXlt"))
 is_ordinal <- function(x) is.ordered(x) || inherits(x, "ordered")
 
+coerce_numeric <- function(x) {
+  if (is.numeric(x)) return(x)
+  if (is.factor(x)) x <- as.character(x)
+  suppressWarnings(as.numeric(x))
+}
+
 default_var_types <- function(dat, id_var) {
   vars <- setdiff(names(dat), c(id_var, ".included"))
 
@@ -75,11 +81,14 @@ safe_fisher_p <- function(inc, x_factor) {
   as.numeric(out)
 }
 
-make_var_plot <- function(dat, var_name) {
+make_var_plot <- function(dat, var_name, var_type = NULL) {
   x <- dat[[var_name]]
+  resolved_type <- if (!is.null(var_type)) var_type else if (is.numeric(x)) "numeric" else "categorical"
 
-  if (is.numeric(x)) {
-    ggplot2::ggplot(dat, ggplot2::aes(x = .data[[var_name]], fill = .included)) +
+  if (resolved_type == "numeric") {
+    dat <- dat %>%
+      dplyr::mutate(.x = coerce_numeric(.data[[var_name]]))
+    ggplot2::ggplot(dat, ggplot2::aes(x = .x, fill = .included)) +
       ggplot2::geom_density(alpha = 0.35, na.rm = TRUE) +
       ggplot2::labs(x = var_name, y = "Density", fill = "") +
       thekidsbiostats::theme_thekids()
@@ -96,20 +105,22 @@ make_var_plot <- function(dat, var_name) {
   }
 }
 
-make_var_summary <- function(dat, var_name) {
+make_var_summary <- function(dat, var_name, var_type = NULL) {
   x <- dat[[var_name]]
+  resolved_type <- if (!is.null(var_type)) var_type else if (is.numeric(x)) "numeric" else "categorical"
 
-  if (is.numeric(x)) {
+  if (resolved_type == "numeric") {
     dat %>%
+      dplyr::mutate(.x = coerce_numeric(.data[[var_name]])) %>%
       dplyr::group_by(.included) %>%
       dplyr::summarise(
-        N = sum(!is.na(.data[[var_name]])),
-        `Missing %` = round(100 * mean(is.na(.data[[var_name]])), 1),
-        Mean = mean(.data[[var_name]], na.rm = TRUE),
-        SD = stats::sd(.data[[var_name]], na.rm = TRUE),
-        Median = stats::median(.data[[var_name]], na.rm = TRUE),
-        Q1 = stats::quantile(.data[[var_name]], 0.25, na.rm = TRUE),
-        Q3 = stats::quantile(.data[[var_name]], 0.75, na.rm = TRUE),
+        N = sum(!is.na(.x)),
+        Missing = round(100 * mean(is.na(.x)), 1),
+        Mean = mean(.x, na.rm = TRUE),
+        SD = stats::sd(.x, na.rm = TRUE),
+        Median = stats::median(.x, na.rm = TRUE),
+        Q1 = stats::quantile(.x, 0.25, na.rm = TRUE),
+        Q3 = stats::quantile(.x, 0.75, na.rm = TRUE),
         .groups = "drop"
       ) %>%
       tidyr::pivot_wider(
