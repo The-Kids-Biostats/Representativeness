@@ -1,3 +1,5 @@
+library(thekidsbiostats)
+
 server <- function(input, output, session) {
   pop_data <- shiny::reactiveVal(NULL)
 

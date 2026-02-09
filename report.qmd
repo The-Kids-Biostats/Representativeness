@@ -91,7 +91,7 @@ make_var_summary <- function(dat, var_name, var_type = NULL) {
       group_by(.included) %>%
       summarise(
         N = sum(!is.na(.x)),
-        Missing = round(100 * mean(is.na(.x)), 1),
+        `Missing %` = round(100 * mean(is.na(.x)), 1),
         Mean = mean(.x, na.rm = TRUE),
         SD = sd(.x, na.rm = TRUE),
         Median = median(.x, na.rm = TRUE),

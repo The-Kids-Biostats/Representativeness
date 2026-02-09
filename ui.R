@@ -1,3 +1,5 @@
+library(thekidsbiostats)
+
 brand_primary <- "#1F3B73"
 brand_secondary <- "#F56B00"
 brand_bg <- "#F7F9FB"

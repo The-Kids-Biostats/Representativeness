@@ -115,7 +115,7 @@ make_var_summary <- function(dat, var_name, var_type = NULL) {
       dplyr::group_by(.included) %>%
       dplyr::summarise(
         N = sum(!is.na(.x)),
-        Missing = round(100 * mean(is.na(.x)), 1),
+        `Missing %` = round(100 * mean(is.na(.x)), 1),
         Mean = mean(.x, na.rm = TRUE),
         SD = stats::sd(.x, na.rm = TRUE),
         Median = stats::median(.x, na.rm = TRUE),
