@@ -88,6 +88,11 @@ ui <- shiny::fluidPage(
         shiny::numericInput("sample_seed", "Random seed (optional)", value = 1, min = 1),
         shiny::actionButton("draw_sample", "Draw random sample")
       ),
+      shiny::checkboxInput(
+        "compare_to_population",
+        "Compare sample to whole population",
+        value = FALSE
+      ),
       shiny::tags$hr(),
       shiny::h4("3. Report"),
       shiny::checkboxInput(
