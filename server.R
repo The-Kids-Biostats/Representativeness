@@ -7,6 +7,8 @@ server <- function(input, output, session) {
     dat <- ggplot2::mpg %>%
       dplyr::mutate(id = dplyr::row_number())
     pop_data(dat)
+    study_data(NULL)
+    sampled_ids_data(NULL)
     shiny::showNotification(
       "Loaded ggplot2::mpg example data with an 'id' column.",
       type = "message"
@@ -17,6 +19,8 @@ server <- function(input, output, session) {
     shiny::req(input$pop_file)
     dat <- read_any(input$pop_file$datapath)
     pop_data(dat)
+    study_data(NULL)
+    sampled_ids_data(NULL)
     shiny::showNotification("Population dataset loaded.", type = "message")
   })
 
@@ -31,12 +35,20 @@ server <- function(input, output, session) {
   })
 
   study_data <- shiny::reactiveVal(NULL)
+  sampled_ids_data <- shiny::reactiveVal(NULL)
 
   shiny::observeEvent(input$study_file, {
     shiny::req(input$study_file)
     dat <- read_any(input$study_file$datapath)
     study_data(dat)
+    sampled_ids_data(NULL)
     shiny::showNotification("Study dataset loaded.", type = "message")
+  })
+
+  shiny::observeEvent(input$sample_mode, {
+    if (!identical(input$sample_mode, "sample")) {
+      sampled_ids_data(NULL)
+    }
   })
 
   shiny::observeEvent(input$draw_sample, {
@@ -61,9 +73,26 @@ server <- function(input, output, session) {
     stud <- pop %>%
       dplyr::semi_join(sampled_ids, by = setNames(id_var, id_var))
 
+    sampled_ids_data(sampled_ids)
     study_data(stud)
     shiny::showNotification("Sampled study dataset from population.", type = "message")
   })
+
+  output$download_sample_ids <- shiny::downloadHandler(
+    filename = function() {
+      paste0("sampled-ids-", format(Sys.Date(), "%Y-%m-%d"), ".csv")
+    },
+    content = function(file) {
+      shiny::req(input$sample_mode == "sample")
+      shiny::req(input$id_var)
+      ids <- sampled_ids_data()
+      shiny::validate(
+        shiny::need(!is.null(ids), "Draw a sample before downloading IDs.")
+      )
+
+      readr::write_csv(ids, file)
+    }
+  )
 
   output$var_select_ui <- shiny::renderUI({
     shiny::req(pop_data())
