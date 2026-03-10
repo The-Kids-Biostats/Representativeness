@@ -171,20 +171,26 @@ server <- function(input, output, session) {
       )
     }
 
+    pop %>%
+      dplyr::mutate(
+        .included = dplyr::if_else(.data[[id_var]] %in% included_ids, "Included", "Not included")
+      )
+  })
+
+  comparison_data <- shiny::reactive({
+    shiny::req(combined_data())
+    dat <- combined_data()
+
     if (identical(input$compare_to, "not_sampled")) {
-      pop %>%
+      dat %>%
         dplyr::mutate(
-          .included = dplyr::if_else(.data[[id_var]] %in% included_ids, "Included", comparison_label())
+          .included = dplyr::if_else(.included == "Included", "Included", comparison_label())
         )
     } else {
-      comparison_dat <- pop %>%
-        dplyr::mutate(.included = comparison_label())
-
-      included_dat <- pop %>%
-        dplyr::filter(.data[[id_var]] %in% included_ids) %>%
-        dplyr::mutate(.included = "Included")
-
-      dplyr::bind_rows(included_dat, comparison_dat)
+      dplyr::bind_rows(
+        dat %>% dplyr::filter(.included == "Included") %>% dplyr::mutate(.included = "Included"),
+        dat %>% dplyr::mutate(.included = comparison_label())
+      )
     }
   })
 
@@ -308,21 +314,33 @@ server <- function(input, output, session) {
 
     res <- purrr::map_dfr(vars, function(v) {
       x <- coerce_numeric(dat[[v]])
-      inc <- dat$.included
-      comparator <- comparison_label()
+      included_idx <- dat$.included == "Included"
+      comparator_idx <- if (identical(input$compare_to, "everyone")) {
+        rep(TRUE, nrow(dat))
+      } else {
+        dat$.included == "Not included"
+      }
 
-      miss_in <- mean(is.na(x[inc == "Included"]))
-      miss_out <- mean(is.na(x[inc == comparator]))
+      miss_in <- mean(is.na(x[included_idx]))
+      miss_out <- mean(is.na(x[comparator_idx]))
 
-      pval_t <- safe_t_test_p(x[inc == "Included"], x[inc == comparator])
-      pval_w <- safe_wilcox_p(x[inc == "Included"], x[inc == comparator])
+      pval_t <- if (identical(input$compare_to, "not_sampled")) {
+        safe_t_test_p(x[included_idx], x[comparator_idx])
+      } else {
+        NA_real_
+      }
+      pval_w <- if (identical(input$compare_to, "not_sampled")) {
+        safe_wilcox_p(x[included_idx], x[comparator_idx])
+      } else {
+        NA_real_
+      }
 
       tibble::tibble(
         variable = v,
         missing_included = round(100 * miss_in, 1),
         missing_not_included = round(100 * miss_out, 1),
-        mean_included = mean(x[inc == "Included"], na.rm = TRUE),
-        mean_not_included = mean(x[inc == comparator], na.rm = TRUE),
+        mean_included = mean(x[included_idx], na.rm = TRUE),
+        mean_not_included = mean(x[comparator_idx], na.rm = TRUE),
         p_ttest = pval_t,
         p_wilcox = pval_w
       )
@@ -349,14 +367,22 @@ server <- function(input, output, session) {
 
     res <- purrr::map_dfr(vars, function(v) {
       x <- dat[[v]]
-      inc <- dat$.included
-      comparator <- comparison_label()
+      included_idx <- dat$.included == "Included"
+      comparator_idx <- if (identical(input$compare_to, "everyone")) {
+        rep(TRUE, nrow(dat))
+      } else {
+        dat$.included == "Not included"
+      }
 
-      miss_in <- mean(is.na(x[inc == "Included"]))
-      miss_out <- mean(is.na(x[inc == comparator]))
+      miss_in <- mean(is.na(x[included_idx]))
+      miss_out <- mean(is.na(x[comparator_idx]))
 
       xx <- as.factor(x)
-      pval <- safe_fisher_p(inc, xx)
+      pval <- if (identical(input$compare_to, "not_sampled")) {
+        safe_fisher_p(dat$.included, xx)
+      } else {
+        NA_real_
+      }
 
       tibble::tibble(
         variable = v,
@@ -420,14 +446,14 @@ server <- function(input, output, session) {
     shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_plot(combined_data(), input$var, var_type = var_type)
+    make_var_plot(comparison_data(), input$var, var_type = var_type)
   })
 
   output$summary_table <- shiny::renderTable({
     shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_summary(combined_data(), input$var, var_type = var_type)
+    make_var_summary(comparison_data(), input$var, var_type = var_type)
   })
 
   output$download_report <- shiny::downloadHandler(
@@ -445,7 +471,7 @@ server <- function(input, output, session) {
           comparison_label = comparison_label(),
           balance_numeric = balance_table_numeric_data(),
           balance_categorical = balance_table_categorical_data(),
-          combined = combined_data(),
+          combined = comparison_data(),
           var_type_map = var_type_map(),
           include_drilldowns = isTRUE(input$report_include_drilldowns),
           vars = if (!is.null(input$report_vars)) input$report_vars else character(0)
