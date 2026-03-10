@@ -169,6 +169,54 @@ server <- function(input, output, session) {
       )
   })
 
+  comparison_labels <- shiny::reactive({
+    list(
+      included = "Included",
+      comparison = if (isTRUE(input$compare_to_population)) "Population" else "Not included"
+    )
+  })
+
+  comparison_values <- function(x, inc) {
+    if (isTRUE(input$compare_to_population)) {
+      list(
+        included = x[inc == "Included"],
+        comparison = x
+      )
+    } else {
+      list(
+        included = x[inc == "Included"],
+        comparison = x[inc == "Not included"]
+      )
+    }
+  }
+
+  comparison_data_for_var <- function(var_name) {
+    base <- combined_data()
+    inc <- base$.included
+    x <- base[[var_name]]
+
+    if (isTRUE(input$compare_to_population)) {
+      tibble::tibble(
+        .included = c(rep("Included", sum(inc == "Included")), rep("Population", length(x))),
+        !!var_name := c(x[inc == "Included"], x)
+      )
+    } else {
+      base %>% dplyr::select(.included, !!var_name)
+    }
+  }
+
+  safe_fisher_population_p <- function(included, population) {
+    levels <- union(levels(as.factor(included)), levels(as.factor(population)))
+    inc_counts <- table(factor(included, levels = levels))
+    pop_counts <- table(factor(population, levels = levels))
+    tab <- rbind(Included = inc_counts, Population = pop_counts)
+
+    if (nrow(tab) < 2 || ncol(tab) < 2) return(NA_real_)
+
+    out <- tryCatch(stats::fisher.test(tab)$p.value, error = function(e) NA_real_)
+    as.numeric(out)
+  }
+
   default_bucket_assignments <- shiny::reactive({
     shiny::req(combined_data())
     shiny::req(input$id_var)
@@ -283,7 +331,6 @@ server <- function(input, output, session) {
     shiny::req(input$id_var)
 
     dat <- combined_data()
-    id_var <- input$id_var
 
     vars <- names(var_type_map())[var_type_map() == "numeric"]
 
@@ -291,18 +338,20 @@ server <- function(input, output, session) {
       x <- coerce_numeric(dat[[v]])
       inc <- dat$.included
 
-      miss_in <- mean(is.na(x[inc == "Included"]))
-      miss_out <- mean(is.na(x[inc == "Not included"]))
+      groups <- comparison_values(x, inc)
 
-      pval_t <- safe_t_test_p(x[inc == "Included"], x[inc == "Not included"])
-      pval_w <- safe_wilcox_p(x[inc == "Included"], x[inc == "Not included"])
+      miss_in <- mean(is.na(groups$included))
+      miss_out <- mean(is.na(groups$comparison))
+
+      pval_t <- safe_t_test_p(groups$included, groups$comparison)
+      pval_w <- safe_wilcox_p(groups$included, groups$comparison)
 
       tibble::tibble(
         variable = v,
         missing_included = round(100 * miss_in, 1),
         missing_not_included = round(100 * miss_out, 1),
-        mean_included = mean(x[inc == "Included"], na.rm = TRUE),
-        mean_not_included = mean(x[inc == "Not included"], na.rm = TRUE),
+        mean_included = mean(groups$included, na.rm = TRUE),
+        mean_not_included = mean(groups$comparison, na.rm = TRUE),
         p_ttest = pval_t,
         p_wilcox = pval_w
       )
@@ -323,7 +372,6 @@ server <- function(input, output, session) {
     shiny::req(input$id_var)
 
     dat <- combined_data()
-    id_var <- input$id_var
 
     vars <- names(var_type_map())[var_type_map() != "numeric"]
 
@@ -331,15 +379,20 @@ server <- function(input, output, session) {
       x <- dat[[v]]
       inc <- dat$.included
 
-      miss_in <- mean(is.na(x[inc == "Included"]))
-      miss_out <- mean(is.na(x[inc == "Not included"]))
+      groups <- comparison_values(x, inc)
 
-      xx <- as.factor(x)
-      pval <- safe_fisher_p(inc, xx)
+      miss_in <- mean(is.na(groups$included))
+      miss_out <- mean(is.na(groups$comparison))
+
+      if (isTRUE(input$compare_to_population)) {
+        pval <- safe_fisher_population_p(groups$included, groups$comparison)
+      } else {
+        pval <- safe_fisher_p(inc, as.factor(x))
+      }
 
       tibble::tibble(
         variable = v,
-        n_levels = nlevels(xx),
+        n_levels = nlevels(as.factor(x)),
         missing_included = round(100 * miss_in, 1),
         missing_not_included = round(100 * miss_out, 1),
         p_value = pval
@@ -355,28 +408,40 @@ server <- function(input, output, session) {
 
   output$balance_table_numeric <- shiny::renderTable({
     shiny::req(balance_table_numeric_data())
-    balance_table_numeric_data() %>%
+    labels <- comparison_labels()
+    out <- balance_table_numeric_data() %>%
       dplyr::transmute(
         Variable = variable,
-        `Missing % (Included)` = missing_included,
-        `Missing % (Not included)` = missing_not_included,
-        `Mean (Included)` = round(mean_included, 2),
-        `Mean (Not included)` = round(mean_not_included, 2),
+        missing_included = missing_included,
+        missing_comparison = missing_not_included,
+        mean_included = round(mean_included, 2),
+        mean_comparison = round(mean_not_included, 2),
         `t-test p` = signif(p_ttest, 3),
         `wilcox p` = signif(p_wilcox, 3)
       )
+
+    names(out)[names(out) == "missing_included"] <- paste0("Missing % (", labels$included, ")")
+    names(out)[names(out) == "missing_comparison"] <- paste0("Missing % (", labels$comparison, ")")
+    names(out)[names(out) == "mean_included"] <- paste0("Mean (", labels$included, ")")
+    names(out)[names(out) == "mean_comparison"] <- paste0("Mean (", labels$comparison, ")")
+    out
   })
 
   output$balance_table_categorical <- shiny::renderTable({
     shiny::req(balance_table_categorical_data())
-    balance_table_categorical_data() %>%
+    labels <- comparison_labels()
+    out <- balance_table_categorical_data() %>%
       dplyr::transmute(
         Variable = variable,
         `# levels` = n_levels,
-        `Missing % (Included)` = missing_included,
-        `Missing % (Not included)` = missing_not_included,
+        missing_included = missing_included,
+        missing_comparison = missing_not_included,
         `Fisher p` = signif(p_value, 3)
       )
+
+    names(out)[names(out) == "missing_included"] <- paste0("Missing % (", labels$included, ")")
+    names(out)[names(out) == "missing_comparison"] <- paste0("Missing % (", labels$comparison, ")")
+    out
   })
 
   output$var_title <- shiny::renderText({
@@ -388,14 +453,16 @@ server <- function(input, output, session) {
     shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_plot(combined_data(), input$var, var_type = var_type)
+    plot_data <- comparison_data_for_var(input$var)
+    make_var_plot(plot_data, input$var, var_type = var_type)
   })
 
   output$summary_table <- shiny::renderTable({
     shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_summary(combined_data(), input$var, var_type = var_type)
+    summary_data <- comparison_data_for_var(input$var)
+    make_var_summary(summary_data, input$var, var_type = var_type)
   })
 
   output$download_report <- shiny::downloadHandler(
@@ -413,6 +480,8 @@ server <- function(input, output, session) {
           balance_categorical = balance_table_categorical_data(),
           combined = combined_data(),
           var_type_map = var_type_map(),
+          comparison_label = comparison_labels()$comparison,
+          compare_to_population = isTRUE(input$compare_to_population),
           include_drilldowns = isTRUE(input$report_include_drilldowns),
           vars = if (!is.null(input$report_vars)) input$report_vars else character(0)
         )

@@ -48,6 +48,8 @@ balance_categorical <- payload$balance_categorical
 dat <- payload$combined
 vars <- payload$vars
 var_type_map <- payload$var_type_map
+comparison_label <- payload$comparison_label
+compare_to_population <- isTRUE(payload$compare_to_population)
 ```
 
 
@@ -81,6 +83,20 @@ make_var_plot <- function(dat, var_name, var_type = NULL) {
 ```
 
 ```{r}
+comparison_data_for_var <- function(dat, var_name, compare_to_population = FALSE) {
+  inc <- dat$.included
+  x <- dat[[var_name]]
+
+  if (isTRUE(compare_to_population)) {
+    tibble::tibble(
+      .included = c(rep("Included", sum(inc == "Included")), rep("Population", length(x))),
+      !!var_name := c(x[inc == "Included"], x)
+    )
+  } else {
+    dat %>% dplyr::select(.included, !!var_name)
+  }
+}
+
 make_var_summary <- function(dat, var_name, var_type = NULL) {
   x <- dat[[var_name]]
   resolved_type <- if (!is.null(var_type)) var_type else if (is.numeric(x)) "numeric" else "categorical"
@@ -130,6 +146,9 @@ make_var_summary <- function(dat, var_name, var_type = NULL) {
 ```{r}
 cat("Generated on:", format(payload$generated_on), "\n")
 cat("ID variable:", payload$id_var, "\n")
+if (!is.null(comparison_label)) {
+  cat("Comparison group:", comparison_label, "\n")
+}
 cat("Drilldowns included:", isTRUE(payload$include_drilldowns), "\n")
 ```
 
@@ -168,10 +187,13 @@ if (!isTRUE(payload$include_drilldowns)) {
   for (v in vars) {
     cat("\n\n## ", v, "\n", sep = "")
     var_type <- if (!is.null(var_type_map)) var_type_map[[v]] else NULL
-    print(make_var_plot(dat, v, var_type = var_type))
+    var_data <- comparison_data_for_var(dat, v, compare_to_population = compare_to_population)
+    print(make_var_plot(var_data, v, var_type = var_type))
     cat("\n\n")
-    make_var_summary(dat, v, var_type = var_type) %>%
-      thekids_table(colour = "MidnightBlue", padding = 0.2)
+    print(
+      make_var_summary(var_data, v, var_type = var_type) %>%
+        thekids_table(colour = "MidnightBlue", padding = 0.2)
+    )
   }
 }
 ```
