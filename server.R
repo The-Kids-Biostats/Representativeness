@@ -3,6 +3,14 @@ library(thekidsbiostats)
 server <- function(input, output, session) {
   pop_data <- shiny::reactiveVal(NULL)
 
+  comparison_label <- shiny::reactive({
+    if (identical(input$compare_to, "not_sampled")) {
+      "Those not sampled"
+    } else {
+      "Everyone"
+    }
+  })
+
   shiny::observeEvent(input$use_example, {
     dat <- ggplot2::mpg %>%
       dplyr::mutate(id = dplyr::row_number())
@@ -163,10 +171,21 @@ server <- function(input, output, session) {
       )
     }
 
-    pop %>%
-      dplyr::mutate(
-        .included = dplyr::if_else(.data[[id_var]] %in% included_ids, "Included", "Not included")
-      )
+    if (identical(input$compare_to, "not_sampled")) {
+      pop %>%
+        dplyr::mutate(
+          .included = dplyr::if_else(.data[[id_var]] %in% included_ids, "Included", comparison_label())
+        )
+    } else {
+      comparison_dat <- pop %>%
+        dplyr::mutate(.included = comparison_label())
+
+      included_dat <- pop %>%
+        dplyr::filter(.data[[id_var]] %in% included_ids) %>%
+        dplyr::mutate(.included = "Included")
+
+      dplyr::bind_rows(included_dat, comparison_dat)
+    }
   })
 
   default_bucket_assignments <- shiny::reactive({
@@ -290,19 +309,20 @@ server <- function(input, output, session) {
     res <- purrr::map_dfr(vars, function(v) {
       x <- coerce_numeric(dat[[v]])
       inc <- dat$.included
+      comparator <- comparison_label()
 
       miss_in <- mean(is.na(x[inc == "Included"]))
-      miss_out <- mean(is.na(x[inc == "Not included"]))
+      miss_out <- mean(is.na(x[inc == comparator]))
 
-      pval_t <- safe_t_test_p(x[inc == "Included"], x[inc == "Not included"])
-      pval_w <- safe_wilcox_p(x[inc == "Included"], x[inc == "Not included"])
+      pval_t <- safe_t_test_p(x[inc == "Included"], x[inc == comparator])
+      pval_w <- safe_wilcox_p(x[inc == "Included"], x[inc == comparator])
 
       tibble::tibble(
         variable = v,
         missing_included = round(100 * miss_in, 1),
         missing_not_included = round(100 * miss_out, 1),
         mean_included = mean(x[inc == "Included"], na.rm = TRUE),
-        mean_not_included = mean(x[inc == "Not included"], na.rm = TRUE),
+        mean_not_included = mean(x[inc == comparator], na.rm = TRUE),
         p_ttest = pval_t,
         p_wilcox = pval_w
       )
@@ -330,9 +350,10 @@ server <- function(input, output, session) {
     res <- purrr::map_dfr(vars, function(v) {
       x <- dat[[v]]
       inc <- dat$.included
+      comparator <- comparison_label()
 
       miss_in <- mean(is.na(x[inc == "Included"]))
-      miss_out <- mean(is.na(x[inc == "Not included"]))
+      miss_out <- mean(is.na(x[inc == comparator]))
 
       xx <- as.factor(x)
       pval <- safe_fisher_p(inc, xx)
@@ -355,28 +376,39 @@ server <- function(input, output, session) {
 
   output$balance_table_numeric <- shiny::renderTable({
     shiny::req(balance_table_numeric_data())
-    balance_table_numeric_data() %>%
+    comparator <- comparison_label()
+
+    out <- balance_table_numeric_data() %>%
       dplyr::transmute(
         Variable = variable,
         `Missing % (Included)` = missing_included,
-        `Missing % (Not included)` = missing_not_included,
+        comparator_missing = missing_not_included,
         `Mean (Included)` = round(mean_included, 2),
-        `Mean (Not included)` = round(mean_not_included, 2),
+        comparator_mean = round(mean_not_included, 2),
         `t-test p` = signif(p_ttest, 3),
         `wilcox p` = signif(p_wilcox, 3)
       )
+
+    names(out)[names(out) == "comparator_missing"] <- paste0("Missing % (", comparator, ")")
+    names(out)[names(out) == "comparator_mean"] <- paste0("Mean (", comparator, ")")
+    out
   })
 
   output$balance_table_categorical <- shiny::renderTable({
     shiny::req(balance_table_categorical_data())
-    balance_table_categorical_data() %>%
+    comparator <- comparison_label()
+
+    out <- balance_table_categorical_data() %>%
       dplyr::transmute(
         Variable = variable,
         `# levels` = n_levels,
         `Missing % (Included)` = missing_included,
-        `Missing % (Not included)` = missing_not_included,
+        comparator_missing = missing_not_included,
         `Fisher p` = signif(p_value, 3)
       )
+
+    names(out)[names(out) == "comparator_missing"] <- paste0("Missing % (", comparator, ")")
+    out
   })
 
   output$var_title <- shiny::renderText({
@@ -409,6 +441,8 @@ server <- function(input, output, session) {
         payload <- list(
           generated_on = Sys.time(),
           id_var = input$id_var,
+          compare_to = input$compare_to,
+          comparison_label = comparison_label(),
           balance_numeric = balance_table_numeric_data(),
           balance_categorical = balance_table_categorical_data(),
           combined = combined_data(),
