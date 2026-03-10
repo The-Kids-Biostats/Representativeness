@@ -86,7 +86,8 @@ ui <- shiny::fluidPage(
         condition = "input.sample_mode == 'sample'",
         shiny::numericInput("sample_n", "Sample size (number of unique IDs)", value = 100, min = 1),
         shiny::numericInput("sample_seed", "Random seed (optional)", value = 1, min = 1),
-        shiny::actionButton("draw_sample", "Draw random sample")
+        shiny::actionButton("draw_sample", "Draw random sample"),
+        shiny::downloadButton("download_sample_ids", "Download sampled IDs (CSV)")
       ),
       shiny::tags$hr(),
       shiny::h4("3. Report"),
