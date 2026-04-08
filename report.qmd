@@ -48,6 +48,22 @@ balance_categorical <- payload$balance_categorical
 dat <- payload$combined
 vars <- payload$vars
 var_type_map <- payload$var_type_map
+comparison_label <- if (!is.null(payload$comparison_label)) payload$comparison_label else "Not included"
+
+if (nrow(balance_numeric) > 0) {
+  balance_numeric <- balance_numeric %>%
+    rename(
+      !!paste0("Missing % (", comparison_label, ")") := missing_not_included,
+      !!paste0("Mean (", comparison_label, ")") := mean_not_included
+    )
+}
+
+if (nrow(balance_categorical) > 0) {
+  balance_categorical <- balance_categorical %>%
+    rename(
+      !!paste0("Missing % (", comparison_label, ")") := missing_not_included
+    )
+}
 ```
 
 
@@ -130,6 +146,7 @@ make_var_summary <- function(dat, var_name, var_type = NULL) {
 ```{r}
 cat("Generated on:", format(payload$generated_on), "\n")
 cat("ID variable:", payload$id_var, "\n")
+cat("Compared to:", comparison_label, "\n")
 cat("Drilldowns included:", isTRUE(payload$include_drilldowns), "\n")
 ```
 
