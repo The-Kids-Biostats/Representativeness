@@ -3,6 +3,14 @@ library(thekidsbiostats)
 server <- function(input, output, session) {
   pop_data <- shiny::reactiveVal(NULL)
 
+  comparison_label <- shiny::reactive({
+    if (identical(input$compare_to, "not_sampled")) {
+      "Those not sampled"
+    } else {
+      "Everyone"
+    }
+  })
+
   shiny::observeEvent(input$use_example, {
     dat <- ggplot2::mpg %>%
       dplyr::mutate(id = dplyr::row_number())
@@ -194,6 +202,23 @@ server <- function(input, output, session) {
     }
   })
 
+  comparison_data <- shiny::reactive({
+    shiny::req(combined_data())
+    dat <- combined_data()
+
+    if (identical(input$compare_to, "not_sampled")) {
+      dat %>%
+        dplyr::mutate(
+          .included = dplyr::if_else(.included == "Included", "Included", comparison_label())
+        )
+    } else {
+      dplyr::bind_rows(
+        dat %>% dplyr::filter(.included == "Included") %>% dplyr::mutate(.included = "Included"),
+        dat %>% dplyr::mutate(.included = comparison_label())
+      )
+    }
+  })
+
   default_bucket_assignments <- shiny::reactive({
     shiny::req(combined_data())
     shiny::req(input$id_var)
@@ -325,20 +350,33 @@ server <- function(input, output, session) {
 
     res <- purrr::map_dfr(vars, function(v) {
       x <- coerce_numeric(dat[[v]])
-      inc <- dat$.included
+      included_idx <- dat$.included == "Included"
+      comparator_idx <- if (identical(input$compare_to, "everyone")) {
+        rep(TRUE, nrow(dat))
+      } else {
+        dat$.included == "Not included"
+      }
 
-      miss_in <- mean(is.na(x[inc == "Included"]))
-      miss_out <- mean(is.na(x[inc != "Included"]))
+      miss_in <- mean(is.na(x[included_idx]))
+      miss_out <- mean(is.na(x[comparator_idx]))
 
-      pval_t <- safe_t_test_p(x[inc == "Included"], x[inc != "Included"])
-      pval_w <- safe_wilcox_p(x[inc == "Included"], x[inc != "Included"])
+      pval_t <- if (identical(input$compare_to, "not_sampled")) {
+        safe_t_test_p(x[included_idx], x[comparator_idx])
+      } else {
+        NA_real_
+      }
+      pval_w <- if (identical(input$compare_to, "not_sampled")) {
+        safe_wilcox_p(x[included_idx], x[comparator_idx])
+      } else {
+        NA_real_
+      }
 
       tibble::tibble(
         variable = v,
         missing_included = round(100 * miss_in, 1),
         missing_not_included = round(100 * miss_out, 1),
-        mean_included = mean(x[inc == "Included"], na.rm = TRUE),
-        mean_not_included = mean(x[inc != "Included"], na.rm = TRUE),
+        mean_included = mean(x[included_idx], na.rm = TRUE),
+        mean_not_included = mean(x[comparator_idx], na.rm = TRUE),
         p_ttest = pval_t,
         p_wilcox = pval_w
       )
@@ -365,13 +403,22 @@ server <- function(input, output, session) {
 
     res <- purrr::map_dfr(vars, function(v) {
       x <- dat[[v]]
-      inc <- dat$.included
+      included_idx <- dat$.included == "Included"
+      comparator_idx <- if (identical(input$compare_to, "everyone")) {
+        rep(TRUE, nrow(dat))
+      } else {
+        dat$.included == "Not included"
+      }
 
-      miss_in <- mean(is.na(x[inc == "Included"]))
-      miss_out <- mean(is.na(x[inc != "Included"]))
+      miss_in <- mean(is.na(x[included_idx]))
+      miss_out <- mean(is.na(x[comparator_idx]))
 
       xx <- as.factor(x)
-      pval <- safe_fisher_p(inc, xx)
+      pval <- if (identical(input$compare_to, "not_sampled")) {
+        safe_fisher_p(dat$.included, xx)
+      } else {
+        NA_real_
+      }
 
       tibble::tibble(
         variable = v,
@@ -391,25 +438,39 @@ server <- function(input, output, session) {
 
   output$balance_table_numeric <- shiny::renderTable({
     shiny::req(balance_table_numeric_data())
-    comparison_label <- if (identical(input$comparison_group, "Everyone")) "Everyone" else "Not included"
-    balance_table_numeric_data() %>%
+    comparator <- comparison_label()
+
+    out <- balance_table_numeric_data() %>%
       dplyr::transmute(
         Variable = variable,
+        `Missing % (Included)` = missing_included,
+        comparator_missing = missing_not_included,
         `Mean (Included)` = round(mean_included, 2),
-        !!paste0("Mean (", comparison_label, ")") := round(mean_not_included, 2),
+        comparator_mean = round(mean_not_included, 2),
         `t-test p` = signif(p_ttest, 3),
         `wilcox p` = signif(p_wilcox, 3)
       )
+
+    names(out)[names(out) == "comparator_missing"] <- paste0("Missing % (", comparator, ")")
+    names(out)[names(out) == "comparator_mean"] <- paste0("Mean (", comparator, ")")
+    out
   })
 
   output$balance_table_categorical <- shiny::renderTable({
     shiny::req(balance_table_categorical_data())
-    balance_table_categorical_data() %>%
+    comparator <- comparison_label()
+
+    out <- balance_table_categorical_data() %>%
       dplyr::transmute(
         Variable = variable,
         `# levels` = n_levels,
+        `Missing % (Included)` = missing_included,
+        comparator_missing = missing_not_included,
         `Fisher p` = signif(p_value, 3)
       )
+
+    names(out)[names(out) == "comparator_missing"] <- paste0("Missing % (", comparator, ")")
+    out
   })
 
   output$missingness_table <- shiny::renderTable({
@@ -446,14 +507,14 @@ server <- function(input, output, session) {
     shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_plot(combined_data(), input$var, var_type = var_type)
+    make_var_plot(comparison_data(), input$var, var_type = var_type)
   })
 
   output$summary_table <- shiny::renderTable({
     shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_summary(combined_data(), input$var, var_type = var_type)
+    make_var_summary(comparison_data(), input$var, var_type = var_type)
   })
 
   output$download_report <- shiny::downloadHandler(
@@ -467,10 +528,11 @@ server <- function(input, output, session) {
         payload <- list(
           generated_on = Sys.time(),
           id_var = input$id_var,
-          comparison_group = if (is.null(input$comparison_group)) "Those not sampled" else input$comparison_group,
+          compare_to = input$compare_to,
+          comparison_label = comparison_label(),
           balance_numeric = balance_table_numeric_data(),
           balance_categorical = balance_table_categorical_data(),
-          combined = combined_data(),
+          combined = comparison_data(),
           var_type_map = var_type_map(),
           include_drilldowns = isTRUE(input$report_include_drilldowns),
           vars = if (!is.null(input$report_vars)) input$report_vars else character(0)

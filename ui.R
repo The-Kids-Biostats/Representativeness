@@ -89,6 +89,15 @@ ui <- shiny::fluidPage(
         shiny::actionButton("draw_sample", "Draw random sample"),
         shiny::downloadButton("download_sample_ids", "Download sampled IDs (CSV)")
       ),
+      shiny::radioButtons(
+        "compare_to",
+        "Compare sample to...",
+        choices = c(
+          "Everyone" = "everyone",
+          "Those not sampled" = "not_sampled"
+        ),
+        selected = "everyone"
+      ),
       shiny::tags$hr(),
       shiny::h4("3. Report"),
       shiny::checkboxInput(
