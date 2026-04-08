@@ -45,6 +45,8 @@ server <- function(input, output, session) {
   study_data <- shiny::reactiveVal(NULL)
   sampled_ids_data <- shiny::reactiveVal(NULL)
 
+  comparison_choices <- c("Those not sampled", "Everyone")
+
   shiny::observeEvent(input$study_file, {
     shiny::req(input$study_file)
     dat <- read_any(input$study_file$datapath)
@@ -141,6 +143,16 @@ server <- function(input, output, session) {
     )
   })
 
+  output$comparison_ui <- shiny::renderUI({
+    shiny::radioButtons(
+      "comparison_group",
+      "Comparison group",
+      choices = comparison_choices,
+      selected = "Those not sampled",
+      inline = TRUE
+    )
+  })
+
   combined_data <- shiny::reactive({
     shiny::req(pop_data())
     shiny::req(study_data())
@@ -171,10 +183,23 @@ server <- function(input, output, session) {
       )
     }
 
-    pop %>%
+    base <- pop %>%
       dplyr::mutate(
-        .included = dplyr::if_else(.data[[id_var]] %in% included_ids, "Included", "Not included")
+        .sampled = .data[[id_var]] %in% included_ids
       )
+
+    comparison <- if (is.null(input$comparison_group)) "Those not sampled" else input$comparison_group
+    if (identical(comparison, "Everyone")) {
+      base %>%
+        dplyr::mutate(
+          .included = dplyr::if_else(.sampled, "Included", "Everyone")
+        )
+    } else {
+      base %>%
+        dplyr::mutate(
+          .included = dplyr::if_else(.sampled, "Included", "Not included")
+        )
+    }
   })
 
   comparison_data <- shiny::reactive({
@@ -200,7 +225,8 @@ server <- function(input, output, session) {
     defaults <- default_var_types(combined_data(), input$id_var)
     list(
       numeric = defaults$numeric,
-      categorical = c(defaults$categorical, defaults$date, defaults$ordinal)
+      categorical = c(defaults$categorical, defaults$ordinal),
+      date = defaults$date
     )
   })
 
@@ -214,6 +240,7 @@ server <- function(input, output, session) {
     } else {
       input$var_types_categorical
     }
+    date_vars <- if (is.null(input$var_types_date)) defaults$date else input$var_types_date
 
     sortable::bucket_list(
       header = NULL,
@@ -228,6 +255,11 @@ server <- function(input, output, session) {
         text = "Categorical",
         labels = categorical_vars,
         input_id = "var_types_categorical"
+      ),
+      sortable::add_rank_list(
+        text = "Date/time",
+        labels = date_vars,
+        input_id = "var_types_date"
       )
     )
   })
@@ -282,9 +314,10 @@ server <- function(input, output, session) {
     type_map[defaults$date] <- "date"
     type_map[defaults$ordinal] <- "ordinal"
 
-    if (!is.null(input$var_types_numeric) || !is.null(input$var_types_categorical)) {
+    if (!is.null(input$var_types_numeric) || !is.null(input$var_types_categorical) || !is.null(input$var_types_date)) {
       default_bucket <- setNames(rep("categorical", length(vars)), vars)
       default_bucket[defaults$numeric] <- "numeric"
+      default_bucket[defaults$date] <- "date"
 
       bucket_override <- default_bucket
       if (!is.null(input$var_types_numeric)) {
@@ -292,6 +325,9 @@ server <- function(input, output, session) {
       }
       if (!is.null(input$var_types_categorical)) {
         bucket_override[intersect(input$var_types_categorical, vars)] <- "categorical"
+      }
+      if (!is.null(input$var_types_date)) {
+        bucket_override[intersect(input$var_types_date, vars)] <- "date"
       }
 
       moved <- bucket_override != default_bucket
@@ -435,6 +471,31 @@ server <- function(input, output, session) {
 
     names(out)[names(out) == "comparator_missing"] <- paste0("Missing % (", comparator, ")")
     out
+  })
+
+  output$missingness_table <- shiny::renderTable({
+    shiny::req(balance_table_numeric_data())
+    shiny::req(balance_table_categorical_data())
+    comparison_label <- if (identical(input$comparison_group, "Everyone")) "Everyone" else "Not included"
+
+    numeric_missing <- balance_table_numeric_data() %>%
+      dplyr::transmute(
+        Variable = variable,
+        Type = "Numeric",
+        `Missing % (Included)` = missing_included,
+        !!paste0("Missing % (", comparison_label, ")") := missing_not_included
+      )
+
+    categorical_missing <- balance_table_categorical_data() %>%
+      dplyr::transmute(
+        Variable = variable,
+        Type = "Categorical/Date",
+        `Missing % (Included)` = missing_included,
+        !!paste0("Missing % (", comparison_label, ")") := missing_not_included
+      )
+
+    dplyr::bind_rows(numeric_missing, categorical_missing) %>%
+      dplyr::arrange(Type, Variable)
   })
 
   output$var_title <- shiny::renderText({
