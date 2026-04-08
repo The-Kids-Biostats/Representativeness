@@ -289,7 +289,7 @@ server <- function(input, output, session) {
     type_map[defaults$date] <- "date"
     type_map[defaults$ordinal] <- "ordinal"
 
-    if (!is.null(input$var_types_numeric) || !is.null(input$var_types_categorical)) {
+    if (!is.null(input$var_types_numeric) || !is.null(input$var_types_categorical) || !is.null(input$var_types_date)) {
       default_bucket <- setNames(rep("categorical", length(vars)), vars)
       default_bucket[defaults$numeric] <- "numeric"
       default_bucket[defaults$date] <- "date"
@@ -338,7 +338,7 @@ server <- function(input, output, session) {
         missing_included = round(100 * miss_in, 1),
         missing_not_included = round(100 * miss_out, 1),
         mean_included = mean(x[inc == "Included"], na.rm = TRUE),
-        mean_not_included = mean(x[inc == "Not included"], na.rm = TRUE),
+        mean_not_included = mean(x[inc != "Included"], na.rm = TRUE),
         p_ttest = pval_t,
         p_wilcox = pval_w
       )
