@@ -93,7 +93,7 @@ make_var_plot <- function(dat, var_name, var_type = NULL) {
       ggplot2::labs(x = var_name, y = "Density", fill = "") +
       thekidsbiostats::theme_thekids() +
       thekidsbiostats::scale_fill_thekids() +
-      thekidsbiostats::scale_col_thekids()
+      thekidsbiostats::scale_colour_thekids()
   } else if (resolved_type == "date") {
     dat <- dat %>%
       dplyr::mutate(.x = as.Date(.data[[var_name]]))
@@ -109,7 +109,7 @@ make_var_plot <- function(dat, var_name, var_type = NULL) {
       ggplot2::scale_x_date(date_labels = "%b %Y") +
       thekidsbiostats::theme_thekids() +
       thekidsbiostats::scale_fill_thekids() +
-      thekidsbiostats::scale_col_thekids()
+      thekidsbiostats::scale_colour_thekids()
   } else {
     dat2 <- dat %>%
       dplyr::mutate(.x = as.factor(.data[[var_name]]))
@@ -120,7 +120,7 @@ make_var_plot <- function(dat, var_name, var_type = NULL) {
       ggplot2::labs(x = var_name, y = "Proportion", fill = "") +
       thekidsbiostats::theme_thekids() +
       thekidsbiostats::scale_fill_thekids() +
-      thekidsbiostats::scale_col_thekids() +
+      thekidsbiostats::scale_colour_thekids() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
   }
 }
