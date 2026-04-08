@@ -91,7 +91,25 @@ make_var_plot <- function(dat, var_name, var_type = NULL) {
     ggplot2::ggplot(dat, ggplot2::aes(x = .x, fill = .included)) +
       ggplot2::geom_density(alpha = 0.35, na.rm = TRUE) +
       ggplot2::labs(x = var_name, y = "Density", fill = "") +
-      thekidsbiostats::theme_thekids()
+      thekidsbiostats::theme_thekids() +
+      thekidsbiostats::scale_fill_thekids() +
+      thekidsbiostats::scale_col_thekids()
+  } else if (resolved_type == "date") {
+    dat <- dat %>%
+      dplyr::mutate(.x = as.Date(.data[[var_name]]))
+
+    ggplot2::ggplot(dat, ggplot2::aes(x = .x, fill = .included)) +
+      ggplot2::geom_histogram(
+        position = "identity",
+        alpha = 0.5,
+        binwidth = 90,
+        na.rm = TRUE
+      ) +
+      ggplot2::labs(x = var_name, y = "Count", fill = "") +
+      ggplot2::scale_x_date(date_labels = "%b %Y") +
+      thekidsbiostats::theme_thekids() +
+      thekidsbiostats::scale_fill_thekids() +
+      thekidsbiostats::scale_col_thekids()
   } else {
     dat2 <- dat %>%
       dplyr::mutate(.x = as.factor(.data[[var_name]]))
@@ -101,6 +119,8 @@ make_var_plot <- function(dat, var_name, var_type = NULL) {
       ggplot2::scale_y_continuous(labels = scales::percent_format()) +
       ggplot2::labs(x = var_name, y = "Proportion", fill = "") +
       thekidsbiostats::theme_thekids() +
+      thekidsbiostats::scale_fill_thekids() +
+      thekidsbiostats::scale_col_thekids() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
   }
 }
@@ -110,23 +130,40 @@ make_var_summary <- function(dat, var_name, var_type = NULL) {
   resolved_type <- if (!is.null(var_type)) var_type else if (is.numeric(x)) "numeric" else "categorical"
 
   if (resolved_type == "numeric") {
-    dat %>%
-      dplyr::mutate(.x = coerce_numeric(.data[[var_name]])) %>%
+    dat2 <- dat %>%
+      dplyr::mutate(.x = coerce_numeric(.data[[var_name]]))
+
+    stats_by_group <- dat2 %>%
       dplyr::group_by(.included) %>%
       dplyr::summarise(
-        N = sum(!is.na(.x)),
-        `Missing %` = round(100 * mean(is.na(.x)), 1),
         Mean = mean(.x, na.rm = TRUE),
         SD = stats::sd(.x, na.rm = TRUE),
         Median = stats::median(.x, na.rm = TRUE),
-        Q1 = stats::quantile(.x, 0.25, na.rm = TRUE),
-        Q3 = stats::quantile(.x, 0.75, na.rm = TRUE),
+        Min = suppressWarnings(min(.x, na.rm = TRUE)),
+        Max = suppressWarnings(max(.x, na.rm = TRUE)),
         .groups = "drop"
       ) %>%
-      tidyr::pivot_wider(
-        names_from = .included,
-        values_from = c(N, `Missing %`, Mean, SD, Median, Q1, Q3),
-        names_glue = "{.value} ({.included})"
+      dplyr::mutate(
+        Min = dplyr::if_else(is.infinite(Min), NA_real_, Min),
+        Max = dplyr::if_else(is.infinite(Max), NA_real_, Max)
+      )
+
+    tibble::tibble(
+      Statistic = c("Mean", "SD", "Median", "Min", "Max")
+    ) %>%
+      dplyr::left_join(
+        stats_by_group %>%
+          tidyr::pivot_longer(
+            cols = c(Mean, SD, Median, Min, Max),
+            names_to = "Statistic",
+            values_to = "Value"
+          ) %>%
+          dplyr::mutate(Value = round(Value, 2)) %>%
+          tidyr::pivot_wider(
+            names_from = .included,
+            values_from = Value
+          ),
+        by = "Statistic"
       )
   } else {
     dat2 <- dat %>%
@@ -137,12 +174,13 @@ make_var_summary <- function(dat, var_name, var_type = NULL) {
       dplyr::group_by(.included) %>%
       dplyr::mutate(Percent = round(100 * n / sum(n), 1)) %>%
       dplyr::ungroup() %>%
-      dplyr::rename(Level = .x, N = n) %>%
+      dplyr::mutate(`N(%)` = paste0(n, " (", Percent, "%)")) %>%
+      dplyr::rename(Level = .x) %>%
       tidyr::pivot_wider(
         names_from = .included,
-        values_from = c(N, Percent),
-        names_glue = "{.value} ({.included})"
+        values_from = `N(%)`,
+        names_glue = "N(%) ({.included})"
       ) %>%
-      dplyr::arrange(dplyr::desc(`N (Included)`))
+      dplyr::arrange(Level)
   }
 }

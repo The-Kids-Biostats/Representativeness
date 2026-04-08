@@ -103,6 +103,7 @@ ui <- shiny::fluidPage(
       shiny::tabsetPanel(
         shiny::tabPanel(
           "Overview",
+          shiny::uiOutput("comparison_ui"),
           shiny::p(
             "Separate balance tables for numeric vs categorical variables.",
             "Includes t-test and Fisher's exact test p-values."
@@ -112,6 +113,11 @@ ui <- shiny::fluidPage(
           shiny::tags$hr(),
           shiny::h4("Categorical variables"),
           shiny::tableOutput("balance_table_categorical")
+        ),
+        shiny::tabPanel(
+          "Missingness",
+          shiny::p("Missingness percentages for included and comparison groups."),
+          shiny::tableOutput("missingness_table")
         ),
         shiny::tabPanel(
           "Variable types",
