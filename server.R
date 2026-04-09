@@ -353,21 +353,17 @@ server <- function(input, output, session) {
 
   balance_table_numeric_data <- shiny::reactive({
     shiny::req(combined_data())
+    shiny::req(comparison_data())
     shiny::req(input$id_var)
 
-    dat <- combined_data()
-    id_var <- input$id_var
+    dat <- comparison_data()
 
     vars <- names(var_type_map())[var_type_map() == "numeric"]
 
     res <- purrr::map_dfr(vars, function(v) {
       x <- coerce_numeric(dat[[v]])
       included_idx <- dat$.included == "Included"
-      comparator_idx <- if (identical(input$compare_to, "everyone")) {
-        rep(TRUE, nrow(dat))
-      } else {
-        dat$.included == "Not included"
-      }
+      comparator_idx <- dat$.included == comparison_label()
 
       miss_in <- mean(is.na(x[included_idx]))
       miss_out <- mean(is.na(x[comparator_idx]))
@@ -398,31 +394,23 @@ server <- function(input, output, session) {
 
   balance_table_categorical_data <- shiny::reactive({
     shiny::req(combined_data())
+    shiny::req(comparison_data())
     shiny::req(input$id_var)
 
-    dat <- combined_data()
-    id_var <- input$id_var
+    dat <- comparison_data()
 
     vars <- names(var_type_map())[var_type_map() %in% c("categorical", "ordinal")]
 
     res <- purrr::map_dfr(vars, function(v) {
       x <- dat[[v]]
       included_idx <- dat$.included == "Included"
-      comparator_idx <- if (identical(input$compare_to, "everyone")) {
-        rep(TRUE, nrow(dat))
-      } else {
-        dat$.included == "Not included"
-      }
+      comparator_idx <- dat$.included == comparison_label()
 
       miss_in <- mean(is.na(x[included_idx]))
       miss_out <- mean(is.na(x[comparator_idx]))
 
       xx <- as.factor(x)
-      fisher_group <- dplyr::if_else(
-        included_idx,
-        "Included",
-        dplyr::if_else(comparator_idx, "Comparator", NA_character_)
-      )
+      fisher_group <- dplyr::if_else(included_idx, "Included", dplyr::if_else(comparator_idx, "Comparator", NA_character_))
       pval <- safe_fisher_p(fisher_group, xx)
 
       tibble::tibble(
