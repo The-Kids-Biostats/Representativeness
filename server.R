@@ -403,7 +403,7 @@ server <- function(input, output, session) {
     dat <- combined_data()
     id_var <- input$id_var
 
-    vars <- names(var_type_map())[var_type_map() != "numeric"]
+    vars <- names(var_type_map())[var_type_map() %in% c("categorical", "ordinal")]
 
     res <- purrr::map_dfr(vars, function(v) {
       x <- dat[[v]]
@@ -418,10 +418,12 @@ server <- function(input, output, session) {
       miss_out <- mean(is.na(x[comparator_idx]))
 
       xx <- as.factor(x)
-      pval <- safe_fisher_p(
-        dplyr::if_else(comparator_idx, dat$.included, NA_character_),
-        xx
+      fisher_group <- dplyr::if_else(
+        included_idx,
+        "Included",
+        dplyr::if_else(comparator_idx, "Comparator", NA_character_)
       )
+      pval <- safe_fisher_p(fisher_group, xx)
 
       tibble::tibble(
         variable = v,
