@@ -45,7 +45,6 @@ server <- function(input, output, session) {
   study_data <- shiny::reactiveVal(NULL)
   sampled_ids_data <- shiny::reactiveVal(NULL)
 
-  comparison_choices <- c("Those not sampled", "Everyone")
 
   shiny::observeEvent(input$study_file, {
     shiny::req(input$study_file)
@@ -55,9 +54,29 @@ server <- function(input, output, session) {
     shiny::showNotification("Study dataset loaded.", type = "message")
   })
 
+  shiny::observeEvent(list(input$study_id_file, input$id_var), {
+    shiny::req(identical(input$sample_mode, "id_upload"))
+    shiny::req(input$study_id_file)
+    shiny::req(input$id_var)
+
+    dat <- read_any(input$study_id_file$datapath)
+    shiny::validate(shiny::need(ncol(dat) >= 1, "Identifier upload must have at least one column."))
+
+    id_col <- names(dat)[1]
+    id_only <- dat %>%
+      dplyr::transmute(!!input$id_var := .data[[id_col]])
+
+    study_data(id_only)
+    sampled_ids_data(NULL)
+    shiny::showNotification("Study identifier file loaded.", type = "message")
+  })
+
   shiny::observeEvent(input$sample_mode, {
     if (!identical(input$sample_mode, "sample")) {
       sampled_ids_data(NULL)
+    }
+    if (identical(input$sample_mode, "sample")) {
+      study_data(NULL)
     }
   })
 
@@ -109,13 +128,12 @@ server <- function(input, output, session) {
     shiny::req(study_data())
     shiny::req(input$id_var)
 
-    common_vars <- intersect(names(pop_data()), names(study_data()))
-    vars <- setdiff(common_vars, input$id_var)
+    vars <- setdiff(names(pop_data()), input$id_var)
 
     shiny::validate(
       shiny::need(
         length(vars) > 0,
-        "No common variables between population and study (apart from the ID column)."
+        "No variables available for drilldown."
       )
     )
 
@@ -126,13 +144,12 @@ server <- function(input, output, session) {
     shiny::req(pop_data())
     shiny::req(study_data())
     shiny::req(input$id_var)
-    common_vars <- intersect(names(pop_data()), names(study_data()))
-    setdiff(common_vars, input$id_var)
+    setdiff(names(pop_data()), input$id_var)
   })
 
   output$report_vars_ui <- shiny::renderUI({
-    shiny::req(report_vars())
     vars <- report_vars()
+    shiny::validate(shiny::need(length(vars) > 0, "No variables available for report."))
     shiny::selectizeInput(
       "report_vars",
       "Variables to include",
@@ -143,13 +160,16 @@ server <- function(input, output, session) {
     )
   })
 
-  output$comparison_ui <- shiny::renderUI({
-    shiny::radioButtons(
-      "comparison_group",
-      "Comparison group",
-      choices = comparison_choices,
-      selected = "Those not sampled",
-      inline = TRUE
+  output$date_grouping_ui <- shiny::renderUI({
+    shiny::req(input$var)
+    shiny::req(var_type_map())
+    if (!identical(var_type_map()[[input$var]], "date")) return(NULL)
+
+    shiny::selectInput(
+      "date_grouping",
+      "Date summary grouping",
+      choices = c("Year" = "year", "Month" = "month"),
+      selected = "year"
     )
   })
 
@@ -188,18 +208,10 @@ server <- function(input, output, session) {
         .sampled = .data[[id_var]] %in% included_ids
       )
 
-    comparison <- if (is.null(input$comparison_group)) "Those not sampled" else input$comparison_group
-    if (identical(comparison, "Everyone")) {
-      base %>%
-        dplyr::mutate(
-          .included = dplyr::if_else(.sampled, "Included", "Everyone")
-        )
-    } else {
-      base %>%
-        dplyr::mutate(
-          .included = dplyr::if_else(.sampled, "Included", "Not included")
-        )
-    }
+    base %>%
+      dplyr::mutate(
+        .included = dplyr::if_else(.sampled, "Included", "Not included")
+      )
   })
 
   comparison_data <- shiny::reactive({
@@ -307,7 +319,7 @@ server <- function(input, output, session) {
     shiny::req(combined_data())
     shiny::req(input$id_var)
     defaults <- default_var_types(combined_data(), input$id_var)
-    vars <- setdiff(names(combined_data()), c(input$id_var, ".included"))
+    vars <- setdiff(names(combined_data()), c(input$id_var, ".included", ".sampled"))
 
     type_map <- setNames(rep("categorical", length(vars)), vars)
     type_map[defaults$numeric] <- "numeric"
@@ -360,16 +372,8 @@ server <- function(input, output, session) {
       miss_in <- mean(is.na(x[included_idx]))
       miss_out <- mean(is.na(x[comparator_idx]))
 
-      pval_t <- if (identical(input$compare_to, "not_sampled")) {
-        safe_t_test_p(x[included_idx], x[comparator_idx])
-      } else {
-        NA_real_
-      }
-      pval_w <- if (identical(input$compare_to, "not_sampled")) {
-        safe_wilcox_p(x[included_idx], x[comparator_idx])
-      } else {
-        NA_real_
-      }
+      pval_t <- safe_t_test_p(x[included_idx], x[comparator_idx])
+      pval_w <- safe_wilcox_p(x[included_idx], x[comparator_idx])
 
       tibble::tibble(
         variable = v,
@@ -389,7 +393,7 @@ server <- function(input, output, session) {
         p_ttest = dplyr::if_else(is.nan(p_ttest), NA_real_, p_ttest),
         p_wilcox = dplyr::if_else(is.nan(p_wilcox), NA_real_, p_wilcox)
       ) %>%
-      dplyr::arrange(p_ttest)
+      dplyr::arrange(variable)
   })
 
   balance_table_categorical_data <- shiny::reactive({
@@ -399,7 +403,7 @@ server <- function(input, output, session) {
     dat <- combined_data()
     id_var <- input$id_var
 
-    vars <- names(var_type_map())[var_type_map() != "numeric"]
+    vars <- names(var_type_map())[var_type_map() %in% c("categorical", "ordinal")]
 
     res <- purrr::map_dfr(vars, function(v) {
       x <- dat[[v]]
@@ -414,11 +418,12 @@ server <- function(input, output, session) {
       miss_out <- mean(is.na(x[comparator_idx]))
 
       xx <- as.factor(x)
-      pval <- if (identical(input$compare_to, "not_sampled")) {
-        safe_fisher_p(dat$.included, xx)
-      } else {
-        NA_real_
-      }
+      fisher_group <- dplyr::if_else(
+        included_idx,
+        "Included",
+        dplyr::if_else(comparator_idx, "Comparator", NA_character_)
+      )
+      pval <- safe_fisher_p(fisher_group, xx)
 
       tibble::tibble(
         variable = v,
@@ -433,7 +438,7 @@ server <- function(input, output, session) {
 
     res %>%
       dplyr::mutate(p_value = dplyr::if_else(is.nan(p_value), NA_real_, p_value)) %>%
-      dplyr::arrange(p_value)
+      dplyr::arrange(variable)
   })
 
   output$balance_table_numeric <- shiny::renderTable({
@@ -443,40 +448,31 @@ server <- function(input, output, session) {
     out <- balance_table_numeric_data() %>%
       dplyr::transmute(
         Variable = variable,
-        `Missing % (Included)` = missing_included,
-        comparator_missing = missing_not_included,
         `Mean (Included)` = round(mean_included, 2),
         comparator_mean = round(mean_not_included, 2),
         `t-test p` = signif(p_ttest, 3),
         `wilcox p` = signif(p_wilcox, 3)
       )
 
-    names(out)[names(out) == "comparator_missing"] <- paste0("Missing % (", comparator, ")")
     names(out)[names(out) == "comparator_mean"] <- paste0("Mean (", comparator, ")")
     out
   })
 
   output$balance_table_categorical <- shiny::renderTable({
     shiny::req(balance_table_categorical_data())
-    comparator <- comparison_label()
-
     out <- balance_table_categorical_data() %>%
       dplyr::transmute(
         Variable = variable,
         `# levels` = n_levels,
-        `Missing % (Included)` = missing_included,
-        comparator_missing = missing_not_included,
         `Fisher p` = signif(p_value, 3)
       )
-
-    names(out)[names(out) == "comparator_missing"] <- paste0("Missing % (", comparator, ")")
     out
   })
 
   output$missingness_table <- shiny::renderTable({
     shiny::req(balance_table_numeric_data())
     shiny::req(balance_table_categorical_data())
-    comparison_label <- if (identical(input$comparison_group, "Everyone")) "Everyone" else "Not included"
+    comparison_label <- if (identical(input$compare_to, "everyone")) "Everyone" else "Not included"
 
     numeric_missing <- balance_table_numeric_data() %>%
       dplyr::transmute(
@@ -514,7 +510,22 @@ server <- function(input, output, session) {
     shiny::req(combined_data())
     shiny::req(input$var)
     var_type <- var_type_map()[[input$var]]
-    make_var_summary(comparison_data(), input$var, var_type = var_type)
+    out <- make_var_summary(
+      comparison_data(),
+      input$var,
+      var_type = var_type,
+      date_group = if (is.null(input$date_grouping)) "year" else input$date_grouping
+    )
+
+    if (!identical(var_type, "numeric")) {
+      comp_col <- paste0("N(%) (", comparison_label(), ")")
+      incl_col <- "N(%) (Included)"
+      preferred <- c("Level", comp_col, incl_col)
+      existing <- intersect(preferred, names(out))
+      out <- out[, c(existing, setdiff(names(out), existing)), drop = FALSE]
+    }
+
+    out
   })
 
   output$download_report <- shiny::downloadHandler(
