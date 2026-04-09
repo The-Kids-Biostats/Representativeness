@@ -71,6 +71,7 @@ ui <- shiny::fluidPage(
         "How will you define the study population?",
         choices = c(
           "Upload study dataset (subset of population)" = "upload",
+          "Upload identifier column only" = "id_upload",
           "Sample from population within the app" = "sample"
         )
       ),
@@ -79,6 +80,14 @@ ui <- shiny::fluidPage(
         shiny::fileInput(
           "study_file",
           "Upload study dataset (CSV, XLSX, RData)",
+          accept = c(".csv", ".xlsx", ".xls", ".RData", ".rda")
+        )
+      ),
+      shiny::conditionalPanel(
+        condition = "input.sample_mode == 'id_upload'",
+        shiny::fileInput(
+          "study_id_file",
+          "Upload study identifiers (single column CSV, XLSX, RData)",
           accept = c(".csv", ".xlsx", ".xls", ".RData", ".rda")
         )
       ),
@@ -96,7 +105,7 @@ ui <- shiny::fluidPage(
           "Everyone" = "everyone",
           "Those not sampled" = "not_sampled"
         ),
-        selected = "everyone"
+        selected = "not_sampled"
       ),
       shiny::tags$hr(),
       shiny::h4("3. Report"),
@@ -112,7 +121,6 @@ ui <- shiny::fluidPage(
       shiny::tabsetPanel(
         shiny::tabPanel(
           "Overview",
-          shiny::uiOutput("comparison_ui"),
           shiny::p(
             "Separate balance tables for numeric vs categorical variables.",
             "Includes t-test and Fisher's exact test p-values."
@@ -139,6 +147,7 @@ ui <- shiny::fluidPage(
         shiny::tabPanel(
           "Drilldown",
           shiny::uiOutput("var_select_ui"),
+          shiny::uiOutput("date_grouping_ui"),
           shiny::tags$hr(),
           shiny::h3(shiny::textOutput("var_title")),
           shiny::plotOutput("dist_plot", height = 420),

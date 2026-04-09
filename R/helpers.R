@@ -125,7 +125,7 @@ make_var_plot <- function(dat, var_name, var_type = NULL) {
   }
 }
 
-make_var_summary <- function(dat, var_name, var_type = NULL) {
+make_var_summary <- function(dat, var_name, var_type = NULL, date_group = "year") {
   x <- dat[[var_name]]
   resolved_type <- if (!is.null(var_type)) var_type else if (is.numeric(x)) "numeric" else "categorical"
 
@@ -165,6 +165,34 @@ make_var_summary <- function(dat, var_name, var_type = NULL) {
           ),
         by = "Statistic"
       )
+  } else if (resolved_type == "date") {
+    dat2 <- dat %>%
+      dplyr::mutate(.x = as.Date(.data[[var_name]]))
+
+    if (identical(date_group, "month")) {
+      dat2 <- dat2 %>%
+        dplyr::mutate(Level = format(.x, "%Y-%m"))
+    } else {
+      dat2 <- dat2 %>%
+        dplyr::mutate(Level = format(.x, "%Y"))
+    }
+
+    dat2 <- dat2 %>%
+      dplyr::mutate(Level = dplyr::if_else(is.na(.x), NA_character_, Level))
+
+    dat2 %>%
+      dplyr::count(.included, Level, .drop = FALSE) %>%
+      dplyr::group_by(.included) %>%
+      dplyr::mutate(Percent = round(100 * n / sum(n), 1)) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(`N(%)` = paste0(n, " (", Percent, "%)")) %>%
+      tidyr::pivot_wider(
+        names_from = .included,
+        values_from = `N(%)`,
+        names_glue = "N(%) ({.included})",
+        values_fill = "0 (0%)"
+      ) %>%
+      dplyr::arrange(Level)
   } else {
     dat2 <- dat %>%
       dplyr::mutate(.x = as.factor(.data[[var_name]]))
@@ -179,7 +207,8 @@ make_var_summary <- function(dat, var_name, var_type = NULL) {
       tidyr::pivot_wider(
         names_from = .included,
         values_from = `N(%)`,
-        names_glue = "N(%) ({.included})"
+        names_glue = "N(%) ({.included})",
+        values_fill = "0 (0%)"
       ) %>%
       dplyr::arrange(Level)
   }
