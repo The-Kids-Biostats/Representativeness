@@ -36,7 +36,7 @@ coerce_numeric <- function(x) {
 }
 
 default_var_types <- function(dat, id_var) {
-  vars <- setdiff(names(dat), c(id_var, ".included"))
+  vars <- setdiff(names(dat), c(id_var, ".included", ".sampled"))
 
   out <- list(
     numeric = character(0),
@@ -186,6 +186,7 @@ make_var_summary <- function(dat, var_name, var_type = NULL, date_group = "year"
       dplyr::mutate(Percent = round(100 * n / sum(n), 1)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(`N(%)` = paste0(n, " (", Percent, "%)")) %>%
+      dplyr::select(.included, Level, `N(%)`) %>%
       tidyr::pivot_wider(
         names_from = .included,
         values_from = `N(%)`,
@@ -204,6 +205,7 @@ make_var_summary <- function(dat, var_name, var_type = NULL, date_group = "year"
       dplyr::ungroup() %>%
       dplyr::mutate(`N(%)` = paste0(n, " (", Percent, "%)")) %>%
       dplyr::rename(Level = .x) %>%
+      dplyr::select(.included, Level, `N(%)`) %>%
       tidyr::pivot_wider(
         names_from = .included,
         values_from = `N(%)`,

@@ -319,7 +319,7 @@ server <- function(input, output, session) {
     shiny::req(combined_data())
     shiny::req(input$id_var)
     defaults <- default_var_types(combined_data(), input$id_var)
-    vars <- setdiff(names(combined_data()), c(input$id_var, ".included"))
+    vars <- setdiff(names(combined_data()), c(input$id_var, ".included", ".sampled"))
 
     type_map <- setNames(rep("categorical", length(vars)), vars)
     type_map[defaults$numeric] <- "numeric"
@@ -372,16 +372,8 @@ server <- function(input, output, session) {
       miss_in <- mean(is.na(x[included_idx]))
       miss_out <- mean(is.na(x[comparator_idx]))
 
-      pval_t <- if (identical(input$compare_to, "not_sampled")) {
-        safe_t_test_p(x[included_idx], x[comparator_idx])
-      } else {
-        NA_real_
-      }
-      pval_w <- if (identical(input$compare_to, "not_sampled")) {
-        safe_wilcox_p(x[included_idx], x[comparator_idx])
-      } else {
-        NA_real_
-      }
+      pval_t <- safe_t_test_p(x[included_idx], x[comparator_idx])
+      pval_w <- safe_wilcox_p(x[included_idx], x[comparator_idx])
 
       tibble::tibble(
         variable = v,
@@ -401,7 +393,7 @@ server <- function(input, output, session) {
         p_ttest = dplyr::if_else(is.nan(p_ttest), NA_real_, p_ttest),
         p_wilcox = dplyr::if_else(is.nan(p_wilcox), NA_real_, p_wilcox)
       ) %>%
-      dplyr::arrange(p_ttest)
+      dplyr::arrange(variable)
   })
 
   balance_table_categorical_data <- shiny::reactive({
@@ -426,11 +418,10 @@ server <- function(input, output, session) {
       miss_out <- mean(is.na(x[comparator_idx]))
 
       xx <- as.factor(x)
-      pval <- if (identical(input$compare_to, "not_sampled")) {
-        safe_fisher_p(dat$.included, xx)
-      } else {
-        NA_real_
-      }
+      pval <- safe_fisher_p(
+        dplyr::if_else(comparator_idx, dat$.included, NA_character_),
+        xx
+      )
 
       tibble::tibble(
         variable = v,
@@ -445,7 +436,7 @@ server <- function(input, output, session) {
 
     res %>%
       dplyr::mutate(p_value = dplyr::if_else(is.nan(p_value), NA_real_, p_value)) %>%
-      dplyr::arrange(p_value)
+      dplyr::arrange(variable)
   })
 
   output$balance_table_numeric <- shiny::renderTable({
